@@ -51,6 +51,9 @@ class SiteChat_Admin_Appearance {
 
 		// Flush rewrite rules if slug changed
 		flush_rewrite_rules();
+
+		// Invalidate the public config cache so the REST /config endpoint reflects changes
+		delete_transient( 'sitechat_config_cache' );
 	}
 
 	private function get_settings(): array {

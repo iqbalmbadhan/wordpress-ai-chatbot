@@ -42,6 +42,9 @@ class SiteChat_Admin_Settings {
 			? array_map( 'absint', (array) $_POST['sitechat_excluded_ids'] )
 			: [];
 		update_option( 'sitechat_excluded_ids', $excluded );
+
+		// Invalidate the public config cache (enabled status may have changed)
+		delete_transient( 'sitechat_config_cache' );
 	}
 
 	private function get_settings(): array {
