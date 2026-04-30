@@ -10,9 +10,9 @@ class SiteChat_Loader {
 		$db         = new SiteChat_DB();
 		$embeddings = new SiteChat_Embeddings();
 		$indexer    = new SiteChat_Indexer( $db, $embeddings );
-		$search     = new SiteChat_Search( $db );
+		$search     = new SiteChat_Search( $db, $embeddings );
 		$chat       = new SiteChat_Chat( $search, $embeddings );
-		$cron       = new SiteChat_Cron( $indexer );
+		$cron       = new SiteChat_Cron( $indexer, $db );
 
 		// Admin
 		if ( is_admin() ) {

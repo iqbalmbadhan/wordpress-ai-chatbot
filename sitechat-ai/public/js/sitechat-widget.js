@@ -230,6 +230,9 @@
 
 	// ── API call ──────────────────────────────────────────────────────────────
 
+	const streamUrl = cfg.apiUrl.replace(/\/chat$/, '/chat/stream');
+	const canStream = typeof ReadableStream !== 'undefined' && typeof TextDecoder !== 'undefined';
+
 	async function sendMessage(question, messages, sendBtn, textarea) {
 		if (isTyping || !question.trim()) return;
 		isTyping = true;
@@ -238,22 +241,124 @@
 		appendMessage(messages, 'user', escHtml(question));
 		history.push({ role: 'user', content: question });
 
+		const payload = {
+			message:    question,
+			session_id: sessionId,
+			history:    history.slice(-10),
+		};
+
+		if (canStream) {
+			await sendMessageStream(payload, messages, textarea);
+		} else {
+			await sendMessageFetch(payload, messages, textarea);
+		}
+
+		isTyping         = false;
+		sendBtn.disabled = false;
+		textarea.focus();
+	}
+
+	/** Streaming path — reads SSE tokens and streams them into a live bubble. */
+	async function sendMessageStream(payload, messages, textarea) {
+		// Create a streaming bubble immediately
+		const msgEl  = el('div', 'sc-msg sc-msg--bot');
+		const body   = el('div', 'sc-msg-body');
+		const bubble = el('div', 'sc-msg-bubble');
+		msgEl.appendChild(buildMsgAvatar());
+		body.appendChild(bubble);
+		msgEl.appendChild(body);
+		messages.appendChild(msgEl);
+
+		let fullText = '';
+		let logId    = null;
+
 		const typingEl = appendTyping(messages);
 
 		try {
-			const res = await fetch(cfg.apiUrl, {
+			const res = await fetch(streamUrl, {
 				method:  'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'X-WP-Nonce':   cfg.nonce,
-				},
-				body: JSON.stringify({
-					message:    question,
-					session_id: sessionId,
-					history:    history.slice(-10),
-				}),
+				headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': cfg.nonce },
+				body:    JSON.stringify(payload),
 			});
 
+			removeTyping(messages);
+
+			if (!res.ok || !res.body) {
+				// Fall back to non-streaming on error
+				const data = await res.json().catch(() => ({}));
+				bubble.innerHTML = `<span class="sc-error">${escHtml(data.message || s.error)}</span>`;
+				return;
+			}
+
+			const reader  = res.body.getReader();
+			const decoder = new TextDecoder();
+			let   buffer  = '';
+
+			while (true) {
+				const { done, value } = await reader.read();
+				if (done) break;
+
+				buffer += decoder.decode(value, { stream: true });
+				const lines = buffer.split('\n');
+				buffer = lines.pop(); // keep partial last line
+
+				for (const line of lines) {
+					if (!line.startsWith('data: ')) continue;
+					let event;
+					try { event = JSON.parse(line.slice(6)); } catch { continue; }
+
+					if (event.error) {
+						bubble.innerHTML = `<span class="sc-error">${escHtml(event.error)}</span>`;
+						return;
+					}
+					if (event.token) {
+						fullText += event.token;
+						bubble.innerHTML = markdownToHtml(fullText);
+						messages.scrollTop = messages.scrollHeight;
+					}
+					if (event.done) {
+						if (event.sources) appendSources(messages, event.sources);
+						break;
+					}
+					if (event.log_id) logId = event.log_id;
+					if (event.session_id) {
+						sessionId = event.session_id;
+						localStorage.setItem('sc_session', sessionId);
+					}
+				}
+			}
+
+			// Add feedback buttons now that we have a complete response
+			if (logId && cfg.showSources !== false) {
+				const fbWrap     = el('div', 'sc-feedback');
+				const helpful    = el('button', 'sc-feedback-btn', '👍 ' + (s.helpful    || 'Helpful'));
+				const notHelpful = el('button', 'sc-feedback-btn', '👎 ' + (s.notHelpful || 'Not helpful'));
+				helpful.addEventListener('click',    () => sendFeedback(logId, 'helpful',     helpful, notHelpful));
+				notHelpful.addEventListener('click', () => sendFeedback(logId, 'not_helpful', notHelpful, helpful));
+				fbWrap.appendChild(helpful);
+				fbWrap.appendChild(notHelpful);
+				body.appendChild(fbWrap);
+			}
+
+			if (fullText) {
+				history.push({ role: 'assistant', content: fullText });
+				if (history.length > 20) history = history.slice(-20);
+			}
+		} catch (e) {
+			removeTyping(messages);
+			bubble.innerHTML = `<span class="sc-error">${escHtml(s.error || 'Error. Please try again.')}</span>`;
+		}
+	}
+
+	/** Non-streaming fallback — single JSON response. */
+	async function sendMessageFetch(payload, messages, textarea) {
+		const typingEl = appendTyping(messages);
+		try {
+			const res  = await fetch(cfg.apiUrl, {
+				method:  'POST',
+				headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': cfg.nonce },
+				body:    JSON.stringify(payload),
+			});
 			const data = await res.json();
 			removeTyping(messages);
 
@@ -262,21 +367,14 @@
 			} else {
 				sessionId = data.session_id || sessionId;
 				localStorage.setItem('sc_session', sessionId);
-
-				const html = markdownToHtml(data.answer || '');
-				appendMessage(messages, 'bot', html, data.log_id);
+				appendMessage(messages, 'bot', markdownToHtml(data.answer || ''), data.log_id);
 				appendSources(messages, data.sources);
-
 				history.push({ role: 'assistant', content: data.answer });
 				if (history.length > 20) history = history.slice(-20);
 			}
 		} catch (e) {
 			removeTyping(messages);
 			appendMessage(messages, 'bot', `<span class="sc-error">${escHtml(s.error || 'Error. Please try again.')}</span>`, null);
-		} finally {
-			isTyping       = false;
-			sendBtn.disabled = false;
-			textarea.focus();
 		}
 	}
 
