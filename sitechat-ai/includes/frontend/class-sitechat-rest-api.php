@@ -190,6 +190,8 @@ class SiteChat_REST_API {
 			],
 		];
 
+		$config = (array) apply_filters( 'sitechat_widget_config', $config );
+
 		set_transient( 'sitechat_config_cache', $config, 5 * MINUTE_IN_SECONDS );
 
 		return rest_ensure_response( $config );

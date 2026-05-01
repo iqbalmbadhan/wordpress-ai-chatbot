@@ -1,7 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
   <rect width="256" height="256" rx="48" fill="#2563eb"/>
-  <path d="M56 76C56 63.85 65.85 54 78 54H178C190.15 54 200 63.85 200 76V148C200 160.15 190.15 170 178 170H144L112 202V170H78C65.85 170 56 160.15 56 148V76Z" fill="white"/>
-  <circle cx="96"  cy="112" r="10" fill="#2563eb"/>
-  <circle cx="128" cy="112" r="10" fill="#2563eb"/>
-  <circle cx="160" cy="112" r="10" fill="#2563eb"/>
+  <!-- Chat bubble -->
+  <path d="M48 72C48 58.74 58.74 48 72 48H184C197.26 48 208 58.74 208 72V152C208 165.26 197.26 176 184 176H148L116 208V176H72C58.74 176 48 165.26 48 152V72Z" fill="white"/>
+  <!-- Dots -->
+  <circle cx="92"  cy="112" r="9" fill="#2563eb"/>
+  <circle cx="128" cy="112" r="9" fill="#2563eb"/>
+  <circle cx="164" cy="112" r="9" fill="#2563eb"/>
+  <!-- Sparkle top-right -->
+  <g fill="white" opacity="0.92">
+    <path d="M196 30 L198.5 36 L205 38 L198.5 40 L196 46 L193.5 40 L187 38 L193.5 36 Z"/>
+    <path d="M216 18 L217.5 22 L222 23.5 L217.5 25 L216 29 L214.5 25 L210 23.5 L214.5 22 Z"/>
+  </g>
 </svg>

@@ -59,15 +59,6 @@ class SiteChat_Admin {
 		wp_enqueue_style( 'wp-color-picker' );
 		wp_enqueue_media();
 
-		// Chart.js — used on analytics tab
-		wp_register_script(
-			'chartjs',
-			'https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js',
-			[],
-			'4.4.3',
-			true
-		);
-
 		wp_enqueue_style(
 			'sitechat-admin',
 			SITECHAT_PLUGIN_URL . 'admin/css/sitechat-admin.css',
@@ -78,7 +69,7 @@ class SiteChat_Admin {
 		wp_enqueue_script(
 			'sitechat-admin',
 			SITECHAT_PLUGIN_URL . 'admin/js/sitechat-admin.js',
-			[ 'jquery', 'wp-color-picker', 'chartjs' ],
+			[ 'jquery', 'wp-color-picker' ],
 			SITECHAT_VERSION,
 			true
 		);

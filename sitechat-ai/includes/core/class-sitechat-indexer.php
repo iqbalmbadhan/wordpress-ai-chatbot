@@ -39,6 +39,8 @@ class SiteChat_Indexer {
 		$failed  = 0;
 		$errors  = [];
 
+		do_action( 'sitechat_before_index', $post_ids );
+
 		foreach ( $post_ids as $i => $post_id ) {
 			if ( $callback ) {
 				$callback( $i + 1, $total, (string) get_the_title( $post_id ) );
@@ -59,7 +61,9 @@ class SiteChat_Indexer {
 		update_option( 'sitechat_total_chunks',  $this->db->get_total_chunk_count() );
 		update_option( 'sitechat_last_full_index', current_time( 'mysql' ) );
 
-		return compact( 'total', 'indexed', 'skipped', 'failed', 'errors' );
+		$result = compact( 'total', 'indexed', 'skipped', 'failed', 'errors' );
+		do_action( 'sitechat_after_index', $result );
+		return $result;
 	}
 
 	/**
@@ -78,7 +82,7 @@ class SiteChat_Indexer {
 			return [ 'status' => 'skipped' ];
 		}
 
-		$full_text = $this->extract_content( $post );
+		$full_text = apply_filters( 'sitechat_chunk_text', $this->extract_content( $post ), $post );
 		if ( strlen( $full_text ) < 50 ) {
 			return [ 'status' => 'skipped' ];
 		}

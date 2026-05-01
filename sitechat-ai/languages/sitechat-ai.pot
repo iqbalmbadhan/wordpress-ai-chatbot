@@ -1,235 +1,475 @@
-# Copyright (C) 2024 Md Iqbal Mahmud
-# This file is distributed under the GPL v2 or later.
+# Copyright (C) 2025 SiteChat AI
+# This file is distributed under the same license as the SiteChat AI plugin.
 msgid ""
 msgstr ""
 "Project-Id-Version: SiteChat AI 1.0.0\n"
-"Report-Msgid-Bugs-To: https://iqbalmahmud.com\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"Report-Msgid-Bugs-To: https://github.com/iqbalmbadhan/wordpress-ai-chatbot/issues\n"
+"POT-Creation-Date: 2025-01-01 00:00:00+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-01-01T00:00:00+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.x\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"X-Generator: SiteChat AI\n"
 "X-Domain: sitechat-ai\n"
 
-#: includes/class-sitechat-activator.php
-msgid "Gemini API key is not configured."
-msgstr ""
-
-#: includes/admin/class-sitechat-admin.php
+#. Plugin Name
 msgid "SiteChat AI"
 msgstr ""
 
+#. Plugin Description
+msgid "AI-powered chatbot trained on your WordPress content. Answers visitor questions with accurate information and source links using Google Gemini AI (free tier)."
+msgstr ""
+
+#: includes/admin/class-sitechat-admin.php
 msgid "Dashboard"
 msgstr ""
 
+#: includes/admin/class-sitechat-admin.php
 msgid "Content"
 msgstr ""
 
+#: includes/admin/class-sitechat-admin.php
 msgid "Appearance"
 msgstr ""
 
+#: includes/admin/class-sitechat-admin.php
 msgid "Analytics"
 msgstr ""
 
+#: includes/admin/class-sitechat-admin.php
 msgid "Settings"
 msgstr ""
 
+#: includes/admin/class-sitechat-admin.php
 msgid "Active"
 msgstr ""
 
+#: includes/admin/class-sitechat-admin.php
 msgid "Inactive"
 msgstr ""
 
-msgid "Settings saved."
+#: includes/admin/class-sitechat-admin.php
+msgid "Get API Key"
 msgstr ""
 
-msgid "SiteChat AI requires a Gemini API key. %s to configure it."
-msgstr ""
-
-msgid "Click here"
-msgstr ""
-
+#: includes/admin/class-sitechat-admin.php
 msgid "You do not have permission to access this page."
 msgstr ""
 
-#: includes/core/class-sitechat-chat.php
-msgid "I couldn't find specific information about that on this website. Please try rephrasing your question or browse the site directly."
+#: includes/admin/class-sitechat-admin.php
+msgid "Settings saved."
+msgstr ""
+
+#: includes/admin/class-sitechat-admin.php
+msgid "SiteChat AI requires a Gemini API key. %s to configure it."
+msgstr ""
+
+#: includes/admin/class-sitechat-admin.php
+msgid "Go to Settings"
+msgstr ""
+
+#: includes/admin/class-sitechat-admin.php
+msgid "Indexing…"
+msgstr ""
+
+#: includes/admin/class-sitechat-admin.php
+msgid "Indexing complete!"
+msgstr ""
+
+#: includes/admin/class-sitechat-admin.php
+msgid "Indexing failed."
+msgstr ""
+
+#: includes/admin/class-sitechat-admin.php
+msgid "Indexing cancelled."
+msgstr ""
+
+#: includes/admin/class-sitechat-admin.php
+msgid "Saving…"
+msgstr ""
+
+#: includes/admin/class-sitechat-admin.php
+msgid "Saved!"
+msgstr ""
+
+#: includes/admin/class-sitechat-admin.php
+msgid "Save failed."
+msgstr ""
+
+#: includes/admin/class-sitechat-admin.php
+msgid "Validating…"
+msgstr ""
+
+#: includes/admin/class-sitechat-admin.php
+msgid "✓ API key is valid!"
+msgstr ""
+
+#: includes/admin/class-sitechat-admin.php
+msgid "✗ Invalid API key."
+msgstr ""
+
+#: includes/admin/class-sitechat-admin.php
+msgid "This will permanently delete all indexed data. This cannot be undone."
+msgstr ""
+
+#: includes/admin/class-sitechat-admin.php
+msgid "This will reset all settings to their defaults."
+msgstr ""
+
+#: includes/admin/class-sitechat-admin.php
+msgid "This will delete ALL data and settings. Type DELETE to confirm."
+msgstr ""
+
+#: includes/admin/class-sitechat-admin.php
+msgid "Type DELETE to confirm:"
+msgstr ""
+
+#: includes/admin/class-sitechat-admin.php
+msgid "DELETE"
+msgstr ""
+
+#: includes/admin/class-sitechat-admin.php
+msgid "CSV export ready."
+msgstr ""
+
+#: includes/admin/class-sitechat-admin.php
+msgid "Old logs deleted."
+msgstr ""
+
+#: includes/admin/class-sitechat-admin.php
+msgid "of"
+msgstr ""
+
+#: includes/admin/class-sitechat-admin.php
+msgid "Chat error. Check your API key."
+msgstr ""
+
+#: includes/admin/class-sitechat-admin.php
+msgid "Select Avatar"
+msgstr ""
+
+#: includes/admin/class-sitechat-admin.php
+msgid "Use as Avatar"
+msgstr ""
+
+#: includes/admin/class-sitechat-admin.php
+msgid "Confirm Action"
+msgstr ""
+
+#: includes/admin/class-sitechat-admin.php
+msgid "Close"
+msgstr ""
+
+#: includes/admin/class-sitechat-admin.php
+msgid "Cancel"
+msgstr ""
+
+#: includes/admin/class-sitechat-admin.php
+msgid "Confirm"
+msgstr ""
+
+#: includes/admin/class-sitechat-admin.php
+msgid "Indexing Content"
+msgstr ""
+
+#: includes/admin/class-sitechat-admin.php
+msgid "Starting…"
+msgstr ""
+
+#: includes/admin/class-sitechat-admin.php
+msgid "Content Chunks"
+msgstr ""
+
+#: includes/admin/class-sitechat-admin.php
+msgid "Test Chatbot"
+msgstr ""
+
+#: includes/admin/class-sitechat-admin.php
+msgid "Type a test message…"
+msgstr ""
+
+#: includes/admin/class-sitechat-admin.php
+msgid "Send"
+msgstr ""
+
+#: includes/admin/class-sitechat-admin.php
+msgid "Embed Codes"
+msgstr ""
+
+#: includes/admin/class-sitechat-admin.php
+msgid "Copy"
+msgstr ""
+
+#: includes/admin/class-sitechat-admin.php
+msgid "In the block editor, search for \"SiteChat AI Chatbot\" in the block inserter."
+msgstr ""
+
+#: includes/admin/class-sitechat-admin-ajax.php
+msgid "Unauthorized."
+msgstr ""
+
+#: includes/admin/class-sitechat-admin-ajax.php
+msgid "No API key provided."
+msgstr ""
+
+#: includes/admin/class-sitechat-admin-ajax.php
+msgid "API key is valid. Connection successful!"
+msgstr ""
+
+#: includes/admin/class-sitechat-admin-ajax.php
+msgid "Unknown error"
+msgstr ""
+
+#: includes/admin/class-sitechat-admin-ajax.php
+msgid "Invalid post ID."
+msgstr ""
+
+#: includes/admin/class-sitechat-admin-ajax.php
+msgid "Post excluded and removed from index."
+msgstr ""
+
+#: includes/admin/class-sitechat-admin-ajax.php
+msgid "Post re-included. Re-index to add it back."
+msgstr ""
+
+#: includes/admin/class-sitechat-admin-ajax.php
+msgid "Invalid ID."
+msgstr ""
+
+#: includes/admin/class-sitechat-admin-ajax.php
+msgid "Invalid document ID."
+msgstr ""
+
+#: includes/admin/class-sitechat-admin-ajax.php
+msgid "Empty message."
+msgstr ""
+
+#: includes/admin/class-sitechat-admin-ajax.php
+msgid "All data deleted."
+msgstr ""
+
+#: includes/admin/class-sitechat-admin-ajax.php
+msgid "Settings reset to defaults."
+msgstr ""
+
+#: includes/admin/class-sitechat-admin-ajax.php
+msgid "Appearance settings saved."
 msgstr ""
 
 #: includes/frontend/class-sitechat-rest-api.php
 msgid "Chatbot is not enabled."
 msgstr ""
 
+#: includes/frontend/class-sitechat-rest-api.php
 msgid "Too many requests. Please wait a moment."
 msgstr ""
 
-#: public/js/sitechat-widget.js (via wp_localize_script)
-msgid "AI is thinking…"
+#: includes/frontend/class-sitechat-rest-api.php
+msgid "Message cannot be empty."
 msgstr ""
 
-msgid "Something went wrong. Please try again."
+#: includes/frontend/class-sitechat-rest-api.php
+msgid "Message must be 1000 characters or fewer."
 msgstr ""
 
-msgid "Sources"
+#: includes/frontend/class-sitechat-rest-api.php
+msgid "History must be an array."
 msgstr ""
 
-msgid "Helpful"
+#: includes/frontend/class-sitechat-rest-api.php
+msgid "History may contain at most 10 items."
 msgstr ""
 
-msgid "Not helpful"
+#: includes/frontend/class-sitechat-rest-api.php
+msgid "Each history item must have a valid role and content."
 msgstr ""
 
-msgid "Powered by SiteChat AI"
+#: includes/core/class-sitechat-chat.php
+msgid "Gemini API key is not configured."
 msgstr ""
 
-msgid "Close chat"
-msgstr ""
-
-msgid "Open chat"
-msgstr ""
-
-msgid "Send"
-msgstr ""
-
-msgid "Clear conversation"
+#: includes/core/class-sitechat-chat.php
+msgid "I couldn't find specific information about that on this website. Please try rephrasing your question or browse the site directly."
 msgstr ""
 
 #: admin/views/dashboard.php
 msgid "Setup Required:"
 msgstr ""
 
+#: admin/views/dashboard.php
+msgid "Please add your Gemini API key in %s to get started."
+msgstr ""
+
+#: admin/views/dashboard.php
 msgid "Pages Indexed"
 msgstr ""
 
+#: admin/views/dashboard.php
 msgid "Content Chunks"
 msgstr ""
 
+#: admin/views/dashboard.php
 msgid "Total Queries"
 msgstr ""
 
+#: admin/views/dashboard.php
 msgid "Queries Today"
 msgstr ""
 
+#: admin/views/dashboard.php
 msgid "Quick Actions"
 msgstr ""
 
+#: admin/views/dashboard.php
 msgid "Index All Content"
 msgstr ""
 
-msgid "Last full index: %s"
+#: admin/views/dashboard.php
+msgid "Last: %s"
 msgstr ""
 
+#: admin/views/dashboard.php
+msgid "ago"
+msgstr ""
+
+#: admin/views/dashboard.php
 msgid "Never"
 msgstr ""
 
-msgid "Status"
+#: admin/views/dashboard.php
+msgid "Send a test message"
 msgstr ""
 
+#: admin/views/dashboard.php
+msgid "Shortcode & REST API"
+msgstr ""
+
+#: admin/views/dashboard.php
+msgid "System Status"
+msgstr ""
+
+#: admin/views/dashboard.php
 msgid "Plugin Status"
 msgstr ""
 
+#: admin/views/dashboard.php
 msgid "API Key"
 msgstr ""
 
+#: admin/views/dashboard.php
 msgid "Configured"
 msgstr ""
 
+#: admin/views/dashboard.php
 msgid "Not Set"
 msgstr ""
 
+#: admin/views/dashboard.php
+msgid "Disabled"
+msgstr ""
+
+#: admin/views/dashboard.php
 msgid "Display Mode"
 msgstr ""
 
-msgid "Helpful Responses"
+#: admin/views/dashboard.php
+msgid "Auto Reindex (Cron)"
 msgstr ""
 
+#: admin/views/dashboard.php
+msgid "Next: "
+msgstr ""
+
+#: admin/views/dashboard.php
+msgid "Not Scheduled"
+msgstr ""
+
+#: admin/views/dashboard.php
 msgid "Avg. Response Time"
 msgstr ""
 
-msgid "Top Questions"
+#: admin/views/dashboard.php
+msgid "PHP Version"
 msgstr ""
 
+#: admin/views/dashboard.php
+msgid "Memory Limit"
+msgstr ""
+
+#: admin/views/dashboard.php
+msgid "Top Questions (Last 30 Days)"
+msgstr ""
+
+#: admin/views/dashboard.php
+msgid "View All →"
+msgstr ""
+
+#: admin/views/dashboard.php
 msgid "Question"
 msgstr ""
 
+#: admin/views/dashboard.php
 msgid "Count"
 msgstr ""
 
-#: admin/views/settings.php
-msgid "Gemini API Configuration"
+#: admin/views/analytics.php
+msgid "Marked Helpful"
 msgstr ""
 
-msgid "Gemini API Key"
+#: admin/views/analytics.php
+msgid "Avg Response Time"
 msgstr ""
 
-msgid "Show"
+#: admin/views/analytics.php
+msgid "Query Volume"
 msgstr ""
 
-msgid "Test Connection"
+#: admin/views/analytics.php
+msgid "Today"
 msgstr ""
 
-msgid "Get a free API key from %s. Both text-embedding-004 and gemini-2.0-flash are on the free tier."
+#: admin/views/analytics.php
+msgid "Top Questions"
 msgstr ""
 
-msgid "Enable Chatbot"
+#: admin/views/analytics.php
+msgid "Recent Conversations"
 msgstr ""
 
-msgid "Enable the chatbot on the frontend"
+#: admin/views/analytics.php
+msgid "Export CSV"
 msgstr ""
 
-msgid "Requires a valid API key and at least one indexed document."
+#: admin/views/analytics.php
+msgid "days"
 msgstr ""
 
-msgid "Indexing Settings"
+#: admin/views/analytics.php
+msgid "Clear Old Logs"
 msgstr ""
 
-msgid "Auto-Index on Save"
+#: admin/views/analytics.php
+msgid "Date"
 msgstr ""
 
-msgid "Automatically re-index posts when they are saved/updated"
+#: admin/views/analytics.php
+msgid "Answer Preview"
 msgstr ""
 
-msgid "Post Types to Index"
+#: admin/views/analytics.php
+msgid "Similarity"
 msgstr ""
 
-msgid "Chunk Size (chars)"
+#: admin/views/analytics.php
+msgid "Time"
 msgstr ""
 
-msgid "Number of characters per content chunk. Recommended: 1000–2000."
+#: admin/views/analytics.php
+msgid "Feedback"
 msgstr ""
 
-msgid "Chunk Overlap (chars)"
-msgstr ""
-
-msgid "Characters of overlap between adjacent chunks for context continuity."
-msgstr ""
-
-msgid "Max Chunks per Document"
-msgstr ""
-
-msgid "Chat Settings"
-msgstr ""
-
-msgid "Chat History Turns"
-msgstr ""
-
-msgid "Number of previous message pairs to include as context."
-msgstr ""
-
-msgid "Rate Limit (per minute)"
-msgstr ""
-
-msgid "Max queries per IP per minute to prevent abuse."
-msgstr ""
-
-msgid "System Prompt"
-msgstr ""
-
-msgid "Instructions given to the AI before each conversation. The retrieved content is automatically appended."
-msgstr ""
-
-msgid "Save Settings"
+#: admin/views/analytics.php
+msgid "No conversations yet."
 msgstr ""

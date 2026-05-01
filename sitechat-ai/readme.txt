@@ -55,12 +55,33 @@ AI-powered chatbot trained on your WordPress content. Answers visitor questions 
 * Custom CSS override
 
 **Developer Friendly:**
-* Zero npm / build step — pure PHP + Vanilla JS
+* Zero npm / build step — pure PHP + Vanilla JS, no CDN dependencies
 * WordPress Coding Standards compliant
 * Full REST API endpoint (`/wp-json/sitechat/v1/chat`)
 * Gutenberg block with `null` save (server-side render)
 * `[sitechat]` shortcode with height/width attributes
 * Translation ready (`.pot` included)
+* Developer hooks and filters for extensibility
+
+= Developer Hooks =
+
+**Actions:**
+
+`do_action( 'sitechat_before_index', array $post_ids )` — Fires before bulk indexing starts.
+
+`do_action( 'sitechat_after_index', array $result )` — Fires after bulk indexing completes. `$result` contains `total`, `indexed`, `skipped`, `failed`, `errors`.
+
+`do_action( 'sitechat_before_chat', string $question, array $history )` — Fires before a chat answer is generated.
+
+**Filters:**
+
+`apply_filters( 'sitechat_chunk_text', string $text, WP_Post $post )` — Modify post content before it is chunked and embedded.
+
+`apply_filters( 'sitechat_system_prompt', string $prompt )` — Modify the system prompt sent to Gemini before each conversation.
+
+`apply_filters( 'sitechat_after_chat', array $result, string $question, array $history )` — Modify or log the chat result before it is returned to the client.
+
+`apply_filters( 'sitechat_widget_config', array $config )` — Modify the public widget configuration returned by the `/wp-json/sitechat/v1/config` endpoint.
 
 = Requirements =
 

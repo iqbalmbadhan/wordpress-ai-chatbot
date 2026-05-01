@@ -34,6 +34,8 @@ class SiteChat_Chat {
 
 		$start = microtime( true );
 
+		do_action( 'sitechat_before_chat', $question, $history );
+
 		// 1. Embed query + retrieve relevant chunks
 		$query_embedding = $this->embeddings->embed_text( $question );
 		if ( is_wp_error( $query_embedding ) ) {
@@ -58,6 +60,7 @@ class SiteChat_Chat {
 		}
 
 		$result['response_time_ms'] = (int) round( ( microtime( true ) - $start ) * 1000 );
+		$result = apply_filters( 'sitechat_after_chat', $result, $question, $history );
 		return $result;
 	}
 
@@ -250,11 +253,13 @@ class SiteChat_Chat {
 			'You are a helpful AI assistant for {site_name} ({site_url}). Answer questions based ONLY on the provided context. Always cite sources with links. If you cannot find the answer in the context, say so honestly and suggest the visitor explore the website or contact support. Keep answers concise (2-4 paragraphs max).'
 		);
 
-		return str_replace(
+		$prompt = str_replace(
 			[ '{site_name}', '{site_url}' ],
 			[ get_bloginfo( 'name' ), home_url() ],
 			$raw
 		);
+
+		return (string) apply_filters( 'sitechat_system_prompt', $prompt );
 	}
 
 	/**
