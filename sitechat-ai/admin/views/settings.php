@@ -18,19 +18,15 @@
 							       value="<?php echo esc_attr( $settings['sitechat_gemini_api_key'] ); ?>"
 							       class="large-text" autocomplete="off">
 							<button type="button" id="sitechat-toggle-key" class="button"><?php esc_html_e( 'Show', 'sitechat-ai' ); ?></button>
-							<button type="button" id="sitechat-test-api" class="button button-secondary"
-							        data-nonce="<?php echo esc_attr( wp_create_nonce( 'sitechat_admin_nonce' ) ); ?>">
-								<?php esc_html_e( 'Test Connection', 'sitechat-ai' ); ?>
+							<button type="button" id="sitechat-validate-key" class="button button-secondary">
+								<?php esc_html_e( 'Validate Key', 'sitechat-ai' ); ?>
 							</button>
 						</div>
 						<p class="description">
-							<?php
-							printf(
-								/* translators: %s: Google AI Studio link */
+							<?php printf(
 								esc_html__( 'Get a free API key from %s. Both text-embedding-004 and gemini-2.0-flash are on the free tier.', 'sitechat-ai' ),
 								'<a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio</a>'
-							);
-							?>
+							); ?>
 						</p>
 						<div id="sitechat-test-result" style="margin-top:8px;"></div>
 					</td>
@@ -69,10 +65,9 @@
 					<td>
 						<?php
 						$index_post_types = (array) $settings['sitechat_index_post_types'];
-						$all_types        = get_post_types( [ 'public' => true ], 'objects' );
-						foreach ( $all_types as $pt ) :
+						foreach ( get_post_types( [ 'public' => true ], 'objects' ) as $pt ) :
 						?>
-						<label style="display:block;margin-bottom:4px;">
+						<label style="display:block;margin-bottom:6px;">
 							<input type="checkbox" name="sitechat_index_post_types[]"
 							       value="<?php echo esc_attr( $pt->name ); ?>"
 							       <?php checked( in_array( $pt->name, $index_post_types, true ) ); ?>>
@@ -88,7 +83,7 @@
 						<input type="number" id="sitechat_chunk_size" name="sitechat_chunk_size"
 						       value="<?php echo esc_attr( $settings['sitechat_chunk_size'] ); ?>"
 						       min="500" max="5000" class="small-text">
-						<p class="description"><?php esc_html_e( 'Number of characters per content chunk. Recommended: 1000–2000.', 'sitechat-ai' ); ?></p>
+						<p class="description"><?php esc_html_e( 'Characters per content chunk. Recommended: 1000–2000.', 'sitechat-ai' ); ?></p>
 					</td>
 				</tr>
 				<tr>
@@ -97,7 +92,7 @@
 						<input type="number" id="sitechat_chunk_overlap" name="sitechat_chunk_overlap"
 						       value="<?php echo esc_attr( $settings['sitechat_chunk_overlap'] ); ?>"
 						       min="0" max="500" class="small-text">
-						<p class="description"><?php esc_html_e( 'Characters of overlap between adjacent chunks for context continuity.', 'sitechat-ai' ); ?></p>
+						<p class="description"><?php esc_html_e( 'Overlap between adjacent chunks for context continuity.', 'sitechat-ai' ); ?></p>
 					</td>
 				</tr>
 				<tr>
@@ -139,7 +134,7 @@
 					<td>
 						<textarea id="sitechat_system_prompt" name="sitechat_system_prompt"
 						          rows="6" class="large-text"><?php echo esc_textarea( $settings['sitechat_system_prompt'] ); ?></textarea>
-						<p class="description"><?php esc_html_e( 'Instructions given to the AI before each conversation. The retrieved content is automatically appended.', 'sitechat-ai' ); ?></p>
+						<p class="description"><?php esc_html_e( 'Instructions given to the AI before each conversation. Use {site_name} and {site_url} as placeholders.', 'sitechat-ai' ); ?></p>
 					</td>
 				</tr>
 			</table>
@@ -148,4 +143,39 @@
 
 	<?php submit_button( __( 'Save Settings', 'sitechat-ai' ) ); ?>
 </form>
+
+<div class="sitechat-card sitechat-card--danger">
+	<div class="sitechat-card-header">
+		<h2><?php esc_html_e( 'Danger Zone', 'sitechat-ai' ); ?></h2>
+	</div>
+	<div class="sitechat-card-body">
+		<div class="sitechat-danger-row">
+			<div class="sitechat-danger-info">
+				<strong><?php esc_html_e( 'Reset Settings', 'sitechat-ai' ); ?></strong>
+				<p class="description"><?php esc_html_e( 'Reset all plugin settings to their default values. Your indexed content is preserved.', 'sitechat-ai' ); ?></p>
+			</div>
+			<button id="sitechat-reset-settings" class="button sitechat-btn-danger">
+				<?php esc_html_e( 'Reset to Defaults', 'sitechat-ai' ); ?>
+			</button>
+		</div>
+		<div class="sitechat-danger-row">
+			<div class="sitechat-danger-info">
+				<strong><?php esc_html_e( 'Clear Index', 'sitechat-ai' ); ?></strong>
+				<p class="description"><?php esc_html_e( 'Delete all indexed documents and chunks. Settings are preserved. You can re-index at any time.', 'sitechat-ai' ); ?></p>
+			</div>
+			<button id="sitechat-clear-index" class="button sitechat-btn-danger">
+				<?php esc_html_e( 'Clear All Index Data', 'sitechat-ai' ); ?>
+			</button>
+		</div>
+		<div class="sitechat-danger-row sitechat-danger-row--severe">
+			<div class="sitechat-danger-info">
+				<strong><?php esc_html_e( 'Delete Everything', 'sitechat-ai' ); ?></strong>
+				<p class="description"><?php esc_html_e( 'Permanently delete all indexed content, chat logs, and plugin settings. This cannot be undone.', 'sitechat-ai' ); ?></p>
+			</div>
+			<button id="sitechat-delete-all" class="button sitechat-btn-danger-severe">
+				<?php esc_html_e( 'Delete All Data', 'sitechat-ai' ); ?>
+			</button>
+		</div>
+	</div>
+</div>
 </div>

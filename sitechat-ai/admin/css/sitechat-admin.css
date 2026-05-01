@@ -12,7 +12,6 @@
 	justify-content: space-between;
 	padding: 16px 0 8px;
 	border-bottom: 1px solid #e5e7eb;
-	margin-bottom: 0;
 }
 
 .sitechat-header-logo {
@@ -28,30 +27,60 @@
 	color: #111827;
 }
 
+.sitechat-version {
+	font-size: 11px;
+	color: #9ca3af;
+	font-weight: 400;
+	display: block;
+}
+
+.sitechat-header-right {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.sitechat-header-link {
+	font-size: 13px;
+	color: #6b7280;
+	text-decoration: none;
+}
+
+.sitechat-header-link:hover { color: #2563eb; }
+
+/* ── Tabs ─────────────────────────────────────────────────────────────────── */
+
 .sitechat-tabs {
+	display: flex;
 	margin: 16px 0 0;
 	border-bottom: 2px solid #e5e7eb;
+	gap: 2px;
 }
 
-.sitechat-tabs .nav-tab {
-	border: none;
-	border-bottom: 2px solid transparent;
-	margin-bottom: -2px;
+.sitechat-tab {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
 	padding: 10px 18px;
+	font-size: 13px;
 	font-weight: 500;
 	color: #6b7280;
-	background: transparent;
+	text-decoration: none;
+	border-bottom: 2px solid transparent;
+	margin-bottom: -2px;
+	transition: color .15s, border-color .15s;
 }
 
-.sitechat-tabs .nav-tab:hover {
-	color: #2563eb;
-	background: transparent;
-}
+.sitechat-tab:hover { color: #2563eb; }
 
-.sitechat-tabs .nav-tab-active {
+.sitechat-tab--active {
 	color: #2563eb;
 	border-bottom-color: #2563eb;
-	background: transparent;
+}
+
+.sitechat-tab-icon {
+	font-size: 15px;
+	line-height: 1;
 }
 
 .sitechat-tab-content {
@@ -74,10 +103,23 @@
 	top: 32px;
 }
 
+.sitechat-card--danger {
+	border-color: #fca5a5;
+}
+
 .sitechat-card-header {
 	padding: 14px 20px;
 	border-bottom: 1px solid #f3f4f6;
 	background: #f9fafb;
+}
+
+.sitechat-card--danger .sitechat-card-header {
+	background: #fff5f5;
+	border-bottom-color: #fee2e2;
+}
+
+.sitechat-card--danger .sitechat-card-header h2 {
+	color: #991b1b;
 }
 
 .sitechat-card-header h2 {
@@ -93,15 +135,23 @@
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 8px;
 }
 
 .sitechat-card-actions {
 	display: flex;
+	align-items: center;
 	gap: 8px;
+	flex-wrap: wrap;
 }
 
 .sitechat-card-body {
 	padding: 20px;
+}
+
+.sitechat-card-body--flush {
+	padding: 0;
 }
 
 /* ── Stats Grid ─────────────────────────────────────────────────────────── */
@@ -128,9 +178,9 @@
 	box-shadow: 0 1px 3px rgba(0,0,0,.05);
 }
 
-.sitechat-stat-card--green { border-left: 4px solid #22c55e; }
+.sitechat-stat-card--green  { border-left: 4px solid #22c55e; }
 .sitechat-stat-card--yellow { border-left: 4px solid #f59e0b; }
-.sitechat-stat-card--red { border-left: 4px solid #ef4444; }
+.sitechat-stat-card--red    { border-left: 4px solid #ef4444; }
 
 .sitechat-stat-icon {
 	font-size: 28px;
@@ -167,6 +217,59 @@
 
 @media ( max-width: 900px ) {
 	.sitechat-dashboard-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Quick Actions ──────────────────────────────────────────────────────── */
+
+.sitechat-quick-actions {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 12px;
+}
+
+@media ( max-width: 700px ) {
+	.sitechat-quick-actions { grid-template-columns: 1fr; }
+}
+
+.sitechat-action-btn {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 4px;
+	padding: 16px;
+	background: #f9fafb;
+	border: 1px solid #e5e7eb;
+	border-radius: 8px;
+	cursor: pointer;
+	text-align: left;
+	transition: background .15s, border-color .15s;
+	width: 100%;
+}
+
+.sitechat-action-btn:hover {
+	background: #eff6ff;
+	border-color: #93c5fd;
+}
+
+.sitechat-action-btn--primary {
+	background: #eff6ff;
+	border-color: #2563eb;
+}
+
+.sitechat-action-btn .dashicons {
+	color: #2563eb;
+	font-size: 20px;
+}
+
+.sitechat-action-btn-label {
+	font-weight: 600;
+	font-size: 13px;
+	color: #111827;
+}
+
+.sitechat-action-btn-desc {
+	font-size: 11px;
+	color: #6b7280;
 }
 
 /* ── Two-Column Layout ──────────────────────────────────────────────────── */
@@ -219,8 +322,8 @@
 	border-radius: 50%;
 }
 
-.sitechat-status--active  { background: #dcfce7; color: #166534; }
-.sitechat-status--active::before { background: #22c55e; }
+.sitechat-status--active   { background: #dcfce7; color: #166534; }
+.sitechat-status--active::before  { background: #22c55e; }
 .sitechat-status--inactive { background: #f3f4f6; color: #6b7280; }
 .sitechat-status--inactive::before { background: #9ca3af; }
 
@@ -238,6 +341,243 @@
 	border: 1px solid #f59e0b;
 	color: #92400e;
 }
+
+/* ── Toast Notifications ─────────────────────────────────────────────────── */
+
+#sitechat-toast-container {
+	position: fixed;
+	bottom: 24px;
+	right: 24px;
+	z-index: 99999;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	pointer-events: none;
+}
+
+.sitechat-toast {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 12px 18px;
+	background: #1f2937;
+	color: #fff;
+	border-radius: 8px;
+	font-size: 13px;
+	font-weight: 500;
+	box-shadow: 0 4px 16px rgba(0,0,0,.2);
+	pointer-events: all;
+	max-width: 360px;
+	animation: sitechat-toast-in .2s ease;
+}
+
+.sitechat-toast--success { background: #166534; }
+.sitechat-toast--error   { background: #991b1b; }
+.sitechat-toast--warning { background: #92400e; }
+
+.sitechat-toast-dismiss {
+	margin-left: auto;
+	background: none;
+	border: none;
+	color: rgba(255,255,255,.6);
+	cursor: pointer;
+	font-size: 16px;
+	padding: 0;
+	line-height: 1;
+}
+
+@keyframes sitechat-toast-in {
+	from { opacity: 0; transform: translateY(8px); }
+	to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Modal Overlay ───────────────────────────────────────────────────────── */
+
+.sitechat-modal-overlay {
+	position: fixed;
+	inset: 0;
+	background: rgba(0,0,0,.45);
+	z-index: 99990;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.sitechat-modal-overlay[hidden] { display: none; }
+
+.sitechat-modal {
+	background: #fff;
+	border-radius: 12px;
+	box-shadow: 0 20px 60px rgba(0,0,0,.25);
+	width: 480px;
+	max-width: calc(100vw - 40px);
+	max-height: calc(100vh - 60px);
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	animation: sitechat-modal-in .18s ease;
+}
+
+.sitechat-modal--wide { width: 700px; }
+.sitechat-modal--chat { width: 520px; }
+
+@keyframes sitechat-modal-in {
+	from { opacity: 0; transform: scale(.96); }
+	to   { opacity: 1; transform: scale(1); }
+}
+
+.sitechat-modal-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 16px 20px;
+	border-bottom: 1px solid #f3f4f6;
+}
+
+.sitechat-modal-header h3 {
+	margin: 0;
+	font-size: 15px;
+	font-weight: 600;
+}
+
+.sitechat-modal-close {
+	background: none;
+	border: none;
+	font-size: 18px;
+	color: #9ca3af;
+	cursor: pointer;
+	padding: 0;
+	line-height: 1;
+}
+
+.sitechat-modal-close:hover { color: #374151; }
+
+.sitechat-modal-body {
+	padding: 20px;
+	overflow-y: auto;
+	flex: 1;
+}
+
+.sitechat-modal-footer {
+	padding: 14px 20px;
+	border-top: 1px solid #f3f4f6;
+	display: flex;
+	justify-content: flex-end;
+	gap: 8px;
+}
+
+/* ── Progress Bar ─────────────────────────────────────────────────────────── */
+
+.sitechat-progress-bar-wrap {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-bottom: 8px;
+}
+
+.sitechat-progress-bar {
+	flex: 1;
+	height: 8px;
+	background: #e5e7eb;
+	border-radius: 99px;
+	overflow: hidden;
+}
+
+.sitechat-progress-fill {
+	height: 100%;
+	background: #2563eb;
+	border-radius: 99px;
+	width: 0;
+	transition: width .3s ease;
+}
+
+.sitechat-progress-fill--indeterminate {
+	animation: sitechat-progress-slide 1.4s ease-in-out infinite;
+	width: 40% !important;
+}
+
+@keyframes sitechat-progress-slide {
+	0%   { transform: translateX(-100%); }
+	100% { transform: translateX(350%); }
+}
+
+.sitechat-progress-text  { font-size: 13px; color: #374151; margin: 0; }
+.sitechat-progress-count { font-size: 12px; color: #9ca3af; margin: 4px 0 0; }
+
+/* ── Test Chat in Modal ───────────────────────────────────────────────────── */
+
+.sitechat-testchat-messages {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	min-height: 200px;
+	max-height: 350px;
+}
+
+.sitechat-testchat-msg {
+	max-width: 80%;
+	padding: 10px 14px;
+	border-radius: 12px;
+	font-size: 13px;
+	line-height: 1.5;
+}
+
+.sitechat-testchat-msg--bot {
+	background: #f3f4f6;
+	color: #111827;
+	align-self: flex-start;
+	border-radius: 12px 12px 12px 2px;
+}
+
+.sitechat-testchat-msg--user {
+	background: #2563eb;
+	color: #fff;
+	align-self: flex-end;
+	border-radius: 12px 12px 2px 12px;
+}
+
+.sitechat-testchat-input-row {
+	display: flex;
+	gap: 8px;
+	justify-content: stretch;
+}
+
+.sitechat-testchat-input-row input {
+	flex: 1;
+}
+
+/* ── Code block with copy ─────────────────────────────────────────────────── */
+
+.sitechat-code-block {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	background: #f3f4f6;
+	border: 1px solid #e5e7eb;
+	border-radius: 6px;
+	padding: 10px 14px;
+	margin-bottom: 14px;
+}
+
+.sitechat-code-block code {
+	flex: 1;
+	font-size: 12px;
+	word-break: break-all;
+	color: #374151;
+}
+
+.sitechat-copy-btn {
+	background: #fff;
+	border: 1px solid #e5e7eb;
+	border-radius: 4px;
+	padding: 3px 8px;
+	font-size: 11px;
+	cursor: pointer;
+	white-space: nowrap;
+	flex-shrink: 0;
+}
+
+.sitechat-copy-btn:hover { background: #f9fafb; }
 
 /* ── Display Mode Grid ──────────────────────────────────────────────────── */
 
@@ -276,52 +616,72 @@
 	background: #eff6ff;
 }
 
-.sitechat-mode-icon { font-size: 26px; }
+.sitechat-mode-icon  { font-size: 26px; }
+.sitechat-mode-label { font-weight: 600; font-size: 13px; color: #1f2937; }
+.sitechat-mode-desc  { font-size: 11px; color: #6b7280; }
 
-.sitechat-mode-label {
-	font-weight: 600;
-	font-size: 13px;
-	color: #1f2937;
-}
+/* ── Range Sliders ───────────────────────────────────────────────────────── */
 
-.sitechat-mode-desc {
-	font-size: 11px;
-	color: #6b7280;
-}
-
-/* ── Toggle labels ───────────────────────────────────────────────────────── */
-
-.sitechat-toggle-label {
+.sitechat-range-row {
 	display: flex;
 	align-items: center;
-	gap: 8px;
-	margin-bottom: 10px;
-	font-size: 13px;
-	cursor: pointer;
+	gap: 10px;
 }
 
-/* ── Status Table ────────────────────────────────────────────────────────── */
-
-.sitechat-status-table {
-	width: 100%;
-	border-collapse: collapse;
+.sitechat-range-row input[type="range"] {
+	flex: 1;
+	max-width: 240px;
+	accent-color: #2563eb;
 }
 
-.sitechat-status-table tr {
-	border-bottom: 1px solid #f3f4f6;
+.sitechat-range-val {
+	font-weight: 600;
+	min-width: 32px;
+	text-align: right;
 }
 
-.sitechat-status-table td {
-	padding: 8px 4px;
-	font-size: 13px;
+/* ── Avatar uploader ─────────────────────────────────────────────────────── */
+
+.sitechat-avatar-row {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	flex-wrap: wrap;
 }
 
-.sitechat-status-table td:first-child {
-	color: #6b7280;
-	width: 40%;
+.sitechat-avatar-preview {
+	width: 56px;
+	height: 56px;
+	border-radius: 50%;
+	object-fit: cover;
+	border: 2px solid #e5e7eb;
 }
 
-/* ── Section Title ───────────────────────────────────────────────────────── */
+.sitechat-avatar-placeholder {
+	background: #f3f4f6;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 10px;
+	color: #9ca3af;
+	text-align: center;
+}
+
+.sitechat-avatar-btns {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+/* ── Color picker overrides ──────────────────────────────────────────────── */
+
+.wp-picker-container {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+
+/* ── Sections & checkboxes ───────────────────────────────────────────────── */
 
 .sitechat-section-title {
 	font-weight: 600;
@@ -329,8 +689,6 @@
 	color: #374151;
 	margin-bottom: 10px;
 }
-
-/* ── Checkboxes ──────────────────────────────────────────────────────────── */
 
 .sitechat-checkboxes {
 	display: flex;
@@ -349,9 +707,7 @@
 	font-size: 13px;
 }
 
-.sitechat-checkbox-label:hover {
-	background: #f9fafb;
-}
+.sitechat-checkbox-label:hover { background: #f9fafb; }
 
 .sitechat-post-type-code {
 	font-size: 10px;
@@ -361,12 +717,49 @@
 	border-radius: 4px;
 }
 
-/* ── Content Table ───────────────────────────────────────────────────────── */
+/* ── Toggle labels ───────────────────────────────────────────────────────── */
+
+.sitechat-toggle-label {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-bottom: 10px;
+	font-size: 13px;
+	cursor: pointer;
+}
+
+/* ── Status / content tables ─────────────────────────────────────────────── */
+
+.sitechat-status-table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.sitechat-status-table tr {
+	border-bottom: 1px solid #f3f4f6;
+}
+
+.sitechat-status-table td {
+	padding: 10px 16px;
+	font-size: 13px;
+}
+
+.sitechat-status-table td:first-child {
+	color: #6b7280;
+	width: 40%;
+}
 
 .sitechat-content-table td,
 .sitechat-logs-table td {
 	font-size: 13px;
 	vertical-align: middle;
+	padding: 8px 12px;
+}
+
+.sitechat-content-table th,
+.sitechat-logs-table th {
+	padding: 10px 12px;
+	font-size: 12px;
 }
 
 .sitechat-error-hint {
@@ -375,13 +768,116 @@
 	margin-left: 4px;
 }
 
-/* ── Empty State ─────────────────────────────────────────────────────────── */
+/* ── Doc row excluded state ──────────────────────────────────────────────── */
 
-.sitechat-empty {
+.sitechat-doc-row--excluded td {
+	opacity: .6;
+}
+
+/* ── Expand button ───────────────────────────────────────────────────────── */
+
+.sitechat-expand-btn {
+	background: none;
+	border: none;
 	color: #9ca3af;
-	text-align: center;
-	padding: 24px;
+	cursor: pointer;
+	font-size: 10px;
+	padding: 2px 4px;
+	transition: transform .15s;
+}
+
+.sitechat-expand-btn.is-open {
+	transform: rotate(90deg);
+	color: #2563eb;
+}
+
+/* ── Inline chunk preview ────────────────────────────────────────────────── */
+
+.sitechat-chunks-cell {
+	background: #f9fafb;
+	padding: 0 !important;
+}
+
+.sitechat-chunks-inner {
+	padding: 16px 20px;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.sitechat-chunks-loading {
+	color: #9ca3af;
 	font-style: italic;
+	font-size: 13px;
+}
+
+.sitechat-chunk-item {
+	background: #fff;
+	border: 1px solid #e5e7eb;
+	border-radius: 6px;
+	padding: 10px 14px;
+}
+
+.sitechat-chunk-meta {
+	font-size: 11px;
+	color: #9ca3af;
+	margin-bottom: 4px;
+}
+
+.sitechat-chunk-text {
+	font-size: 12px;
+	color: #374151;
+	line-height: 1.6;
+	white-space: pre-wrap;
+}
+
+/* ── Content filters ─────────────────────────────────────────────────────── */
+
+.sitechat-content-filters {
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+.sitechat-content-filters input,
+.sitechat-content-filters select {
+	font-size: 13px;
+}
+
+/* ── Analytics chart ─────────────────────────────────────────────────────── */
+
+.sitechat-chart-container {
+	position: relative;
+	height: 220px;
+}
+
+.sitechat-period-btns {
+	display: flex;
+	gap: 4px;
+}
+
+/* ── Log detail row ──────────────────────────────────────────────────────── */
+
+.sitechat-log-detail {
+	background: #f9fafb;
+	padding: 14px 20px !important;
+	font-size: 13px;
+	color: #374151;
+	line-height: 1.6;
+	white-space: pre-wrap;
+}
+
+.sitechat-log-preview {
+	color: #6b7280;
+	font-size: 12px;
+}
+
+/* ── Clear logs row ──────────────────────────────────────────────────────── */
+
+.sitechat-clear-logs-row {
+	display: flex;
+	align-items: center;
+	gap: 6px;
 }
 
 /* ── API Key Row ─────────────────────────────────────────────────────────── */
@@ -390,51 +886,85 @@
 	display: flex;
 	gap: 8px;
 	align-items: center;
+	flex-wrap: wrap;
 }
 
-.sitechat-api-key-row input {
+.sitechat-api-key-row input { flex: 1; min-width: 200px; }
+
+/* ── Danger Zone ─────────────────────────────────────────────────────────── */
+
+.sitechat-danger-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 16px 0;
+	gap: 16px;
+	border-bottom: 1px solid #fee2e2;
+}
+
+.sitechat-danger-row:last-child { border-bottom: none; }
+
+.sitechat-danger-row--severe {
+	background: #fff5f5;
+	margin: 0 -20px;
+	padding: 16px 20px;
+	border-radius: 0 0 10px 10px;
+}
+
+.sitechat-danger-info {
 	flex: 1;
 }
 
-/* ── Danger Button ───────────────────────────────────────────────────────── */
+.sitechat-danger-info strong {
+	display: block;
+	font-size: 13px;
+	color: #374151;
+	margin-bottom: 2px;
+}
+
+.sitechat-danger-info .description {
+	font-size: 12px;
+	margin: 0;
+}
+
+/* ── Danger Buttons ──────────────────────────────────────────────────────── */
 
 .sitechat-btn-danger {
 	color: #dc2626 !important;
-	border-color: #dc2626 !important;
+	border-color: #fca5a5 !important;
+	background: #fff !important;
+	white-space: nowrap;
 }
 
 .sitechat-btn-danger:hover {
 	background: #fee2e2 !important;
+	border-color: #dc2626 !important;
 }
 
-/* ── Progress Bar ─────────────────────────────────────────────────────────── */
-
-.sitechat-progress-bar {
-	height: 8px;
-	background: #e5e7eb;
-	border-radius: 99px;
-	overflow: hidden;
-	margin-bottom: 6px;
+.sitechat-btn-danger-severe {
+	background: #dc2626 !important;
+	color: #fff !important;
+	border-color: #dc2626 !important;
+	border: 1px solid;
+	border-radius: 3px;
+	padding: 5px 14px;
+	cursor: pointer;
+	font-size: 13px;
+	font-weight: 600;
+	white-space: nowrap;
 }
 
-.sitechat-progress-fill {
-	height: 100%;
-	background: #2563eb;
-	border-radius: 99px;
-	width: 0;
-	transition: width .3s;
-	animation: sitechat-progress-indeterminate 1.5s ease-in-out infinite;
+.sitechat-btn-danger-severe:hover {
+	background: #b91c1c !important;
 }
 
-@keyframes sitechat-progress-indeterminate {
-	0%   { width: 0; margin-left: 0; }
-	50%  { width: 60%; margin-left: 20%; }
-	100% { width: 0; margin-left: 100%; }
-}
+/* ── Empty State ─────────────────────────────────────────────────────────── */
 
-.sitechat-progress-text {
-	font-size: 12px;
-	color: #6b7280;
+.sitechat-empty {
+	color: #9ca3af;
+	text-align: center;
+	padding: 32px;
+	font-style: italic;
 }
 
 /* ── Preview Widget ──────────────────────────────────────────────────────── */
@@ -449,7 +979,7 @@
 
 #sitechat-preview-widget {
 	position: absolute;
-	bottom: 70px;
+	bottom: 72px;
 	right: 12px;
 	width: 280px;
 	background: #fff;
@@ -465,7 +995,6 @@
 	align-items: center;
 	gap: 8px;
 	padding: 12px 14px;
-	background: #2563eb;
 	color: #fff;
 }
 
@@ -474,6 +1003,7 @@
 	height: 28px;
 	border-radius: 50%;
 	background: rgba(255,255,255,.3);
+	flex-shrink: 0;
 }
 
 .sc-preview-title {
@@ -514,12 +1044,9 @@
 	color: #111827;
 }
 
-.sc-preview-message--user {
-	align-self: flex-end;
-}
+.sc-preview-message--user { align-self: flex-end; }
 
 .sc-preview-message--user p {
-	background: #2563eb;
 	color: #fff;
 	padding: 8px 10px;
 	border-radius: 12px 12px 2px 12px;
@@ -539,10 +1066,10 @@
 	padding: 6px 12px;
 	font-size: 11px;
 	outline: none;
+	background: #f9fafb;
 }
 
 .sc-preview-input button {
-	background: #2563eb;
 	color: #fff;
 	border: none;
 	border-radius: 50%;
@@ -555,12 +1082,11 @@
 
 #sitechat-preview-bubble {
 	position: absolute;
-	bottom: 12px;
-	right: 12px;
-	width: 48px;
-	height: 48px;
+	bottom: 14px;
+	right: 14px;
+	width: 50px;
+	height: 50px;
 	border-radius: 50%;
-	background: #2563eb;
 	color: #fff;
 	display: flex;
 	align-items: center;
@@ -568,4 +1094,14 @@
 	font-size: 22px;
 	box-shadow: 0 4px 16px rgba(37,99,235,.4);
 	cursor: pointer;
+}
+
+/* ── Doc actions compact ─────────────────────────────────────────────────── */
+
+.sitechat-doc-actions {
+	white-space: nowrap;
+}
+
+.sitechat-doc-actions .button {
+	margin-right: 2px;
 }
