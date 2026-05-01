@@ -65,7 +65,7 @@ class SiteChat_Admin_Ajax {
 			wp_send_json_error( [ 'message' => __( 'No API key provided.', 'sitechat-ai' ) ] );
 		}
 
-		$url  = 'https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key=' . rawurlencode( $api_key );
+		$url  = 'https://generativelanguage.googleapis.com/v1/models/text-embedding-004:embedContent?key=' . rawurlencode( $api_key );
 		$resp = wp_remote_post( $url, [
 			'headers' => [ 'Content-Type' => 'application/json' ],
 			'body'    => wp_json_encode( [

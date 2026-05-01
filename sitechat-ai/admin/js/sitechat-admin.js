@@ -494,8 +494,9 @@ jQuery(function ($) {
 
 	$('#sitechat-settings-form, #sitechat-appearance-form').on('submit', function (e) {
 		e.preventDefault();
-		const $form = $(this);
-		const $btn  = $form.find('[type="submit"]');
+		const $form  = $(this);
+		const $btn   = $form.find('[type="submit"]');
+		const origVal = $btn.val(); // capture BEFORE changing
 		$btn.prop('disabled', true).val(s.saving || 'Saving…');
 		toast(s.saving || 'Saving…', 'default', 1500);
 
@@ -509,11 +510,8 @@ jQuery(function ($) {
 			})
 			.fail(function () { toast(s.saveFailed || 'Save failed.', 'error'); })
 			.always(function () {
-				$btn.prop('disabled', false).val($btn.data('original') || 'Save Settings');
+				$btn.prop('disabled', false).val(origVal);
 			});
-
-		// Cache original button label
-		if (!$btn.data('original')) $btn.data('original', $btn.val());
 	});
 
 	// ── URL hash tab sync ─────────────────────────────────────────────────────
@@ -557,9 +555,43 @@ jQuery(function ($) {
 
 	// ── Display mode cards ────────────────────────────────────────────────────
 
+	// Initialize mode-specific sections on page load
+	(function () {
+		const $active = $('.sitechat-mode-card--active input[type="radio"]');
+		if ($active.length) {
+			const mode = $active.val();
+			$('#sitechat-slidein-settings').toggle(mode === 'slide_in');
+			$('#sitechat-fullpage-settings').toggle(mode === 'full_page');
+			$('#sitechat-preview-container').attr('data-preview-mode', mode);
+			if (mode !== 'bubble') $('#sitechat-preview-bubble').hide();
+		}
+	}());
+
 	$(document).on('click', '.sitechat-mode-card', function () {
 		$('.sitechat-mode-card').removeClass('sitechat-mode-card--active');
 		$(this).addClass('sitechat-mode-card--active');
+
+		const mode = $(this).find('input[type="radio"]').val();
+
+		// Show/hide mode-specific settings panels
+		$('#sitechat-slidein-settings').toggle(mode === 'slide_in');
+		$('#sitechat-fullpage-settings').toggle(mode === 'full_page');
+
+		// Update preview appearance
+		$('#sitechat-preview-container').attr('data-preview-mode', mode);
+		if (mode === 'bubble') {
+			$('#sitechat-preview-bubble').show();
+			$('#sitechat-preview-widget').css({ position: '', bottom: '', right: '', width: '', borderRadius: '' });
+		} else if (mode === 'slide_in') {
+			$('#sitechat-preview-bubble').hide();
+			$('#sitechat-preview-widget').css({ position: '', bottom: '', right: '', width: '100%', borderRadius: '0' });
+		} else if (mode === 'embedded') {
+			$('#sitechat-preview-bubble').hide();
+			$('#sitechat-preview-widget').css({ position: '', bottom: '', right: '', width: '100%', borderRadius: '8px' });
+		} else if (mode === 'full_page') {
+			$('#sitechat-preview-bubble').hide();
+			$('#sitechat-preview-widget').css({ position: '', bottom: '', right: '', width: '100%', borderRadius: '0' });
+		}
 	});
 
 	// ── Avatar media uploader ─────────────────────────────────────────────────

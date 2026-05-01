@@ -7,7 +7,7 @@ class SiteChat_Embeddings {
 
 	private const EMBED_MODEL  = 'text-embedding-004';
 	private const EMBED_DIM    = 768;
-	private const API_BASE     = 'https://generativelanguage.googleapis.com/v1beta/models/';
+	private const API_BASE     = 'https://generativelanguage.googleapis.com/v1/models/';
 	private const MAX_RETRIES  = 3;
 
 	private function api_key(): string {

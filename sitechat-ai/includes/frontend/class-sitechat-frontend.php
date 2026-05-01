@@ -91,6 +91,16 @@ class SiteChat_Frontend {
 			return false;
 		}
 
+		// The full-page template enqueues assets itself; skip here to avoid conflicts.
+		if ( get_query_var( 'sitechat_page' ) ) {
+			return false;
+		}
+
+		// In full_page mode the widget has no root div on regular pages.
+		if ( get_option( 'sitechat_display_mode', 'bubble' ) === 'full_page' ) {
+			return false;
+		}
+
 		$show_on   = get_option( 'sitechat_show_on', 'all' );
 		$page_list = (array) get_option( 'sitechat_page_list', [] );
 

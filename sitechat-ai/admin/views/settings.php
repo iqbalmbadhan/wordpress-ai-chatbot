@@ -28,6 +28,20 @@
 								'<a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio</a>'
 							); ?>
 						</p>
+						<details class="sitechat-api-guide" style="margin-top:10px;">
+							<summary style="cursor:pointer;font-weight:600;color:#2563eb;"><?php esc_html_e( 'How to get a free API key — step by step', 'sitechat-ai' ); ?></summary>
+							<ol style="margin:10px 0 0 18px;line-height:1.8;">
+								<li><?php printf( esc_html__( 'Go to %s (no credit card required).', 'sitechat-ai' ), '<a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a>' ); ?></li>
+								<li><?php esc_html_e( 'Sign in with your Google account.', 'sitechat-ai' ); ?></li>
+								<li><?php esc_html_e( 'Click the blue "Create API key" button.', 'sitechat-ai' ); ?></li>
+								<li><?php esc_html_e( 'Choose "Create API key in new project" (or select an existing project).', 'sitechat-ai' ); ?></li>
+								<li><?php esc_html_e( 'Copy the generated key (starts with "AIza…").', 'sitechat-ai' ); ?></li>
+								<li><?php esc_html_e( 'Paste it into the API key field above and click "Validate Key".', 'sitechat-ai' ); ?></li>
+							</ol>
+							<p style="margin:8px 0 0;"><strong><?php esc_html_e( 'Free tier limits:', 'sitechat-ai' ); ?></strong>
+								<?php esc_html_e( 'text-embedding-004 — 1,500 requests/day · gemini-2.0-flash — 15 RPM / 1,500 requests/day', 'sitechat-ai' ); ?>
+							</p>
+						</details>
 						<div id="sitechat-test-result" style="margin-top:8px;"></div>
 					</td>
 				</tr>
