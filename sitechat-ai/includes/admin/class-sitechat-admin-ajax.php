@@ -66,28 +66,45 @@ class SiteChat_Admin_Ajax {
 			wp_send_json_error( [ 'message' => __( 'No API key provided.', 'sitechat-ai' ) ] );
 		}
 
-		$url  = 'https://generativelanguage.googleapis.com/v1/models/text-embedding-004:embedContent?key=' . rawurlencode( $api_key );
-		$resp = wp_remote_post( $url, [
-			'headers' => [ 'Content-Type' => 'application/json' ],
-			'body'    => wp_json_encode( [
-				'model'   => 'models/text-embedding-004',
-				'content' => [ 'parts' => [ [ 'text' => 'Test' ] ] ],
-			] ),
-			'timeout' => 15,
+		$body = wp_json_encode( [
+			'model'   => 'models/text-embedding-004',
+			'content' => [ 'parts' => [ [ 'text' => 'Test' ] ] ],
 		] );
 
-		if ( is_wp_error( $resp ) ) {
-			wp_send_json_error( [ 'message' => $resp->get_error_message() ] );
+		// Try v1 then v1beta — which version works varies by account / region.
+		$versions   = [ 'v1', 'v1beta' ];
+		$cached_ver = (string) get_option( 'sitechat_embed_api_version', '' );
+		if ( $cached_ver && in_array( $cached_ver, $versions, true ) ) {
+			$versions = array_merge( [ $cached_ver ], array_diff( $versions, [ $cached_ver ] ) );
 		}
 
-		$code = wp_remote_retrieve_response_code( $resp );
-		$data = json_decode( wp_remote_retrieve_body( $resp ), true );
+		$last_error = __( 'Unknown error', 'sitechat-ai' );
+		foreach ( $versions as $version ) {
+			$url  = 'https://generativelanguage.googleapis.com/' . $version
+				. '/models/text-embedding-004:embedContent?key=' . rawurlencode( $api_key );
+			$resp = wp_remote_post( $url, [
+				'headers' => [ 'Content-Type' => 'application/json' ],
+				'body'    => $body,
+				'timeout' => 15,
+			] );
 
-		if ( $code === 200 && ! empty( $data['embedding']['values'] ) ) {
-			wp_send_json_success( [ 'message' => __( 'API key is valid. Connection successful!', 'sitechat-ai' ) ] );
-		} else {
-			wp_send_json_error( [ 'message' => $data['error']['message'] ?? __( 'Unknown error', 'sitechat-ai' ) ] );
+			if ( is_wp_error( $resp ) ) {
+				$last_error = $resp->get_error_message();
+				continue;
+			}
+
+			$code = wp_remote_retrieve_response_code( $resp );
+			$data = json_decode( wp_remote_retrieve_body( $resp ), true );
+
+			if ( $code === 200 && ! empty( $data['embedding']['values'] ) ) {
+				update_option( 'sitechat_embed_api_version', $version ); // cache winner
+				wp_send_json_success( [ 'message' => __( 'API key is valid. Connection successful!', 'sitechat-ai' ) ] );
+			}
+
+			$last_error = $data['error']['message'] ?? __( 'Unknown error', 'sitechat-ai' );
 		}
+
+		wp_send_json_error( [ 'message' => $last_error ] );
 	}
 
 	// ── Chat provider validation ──────────────────────────────────────────────
