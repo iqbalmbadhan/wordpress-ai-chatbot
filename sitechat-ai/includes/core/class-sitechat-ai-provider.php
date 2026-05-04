@@ -426,7 +426,14 @@ class SiteChat_AI_Provider {
 		$data = json_decode( wp_remote_retrieve_body( $response ), true );
 
 		if ( $code !== 200 || empty( $data['choices'][0]['message']['content'] ) ) {
-			return new WP_Error( 'chat_failed', $data['error']['message'] ?? 'API error (HTTP ' . $code . ')', [ 'status' => $code ] );
+			// Extract the most descriptive error available (OpenRouter adds metadata.raw)
+			$error_msg = $data['error']['message'] ?? null;
+			$raw       = $data['error']['metadata']['raw'] ?? null;
+			if ( $raw && is_string( $raw ) && $raw !== $error_msg ) {
+				$error_msg = $error_msg ? $error_msg . ' — ' . $raw : $raw;
+			}
+			$error_msg = $error_msg ?? 'API error (HTTP ' . $code . ')';
+			return new WP_Error( 'chat_failed', $error_msg, [ 'status' => $code ] );
 		}
 
 		return [ 'text' => $data['choices'][0]['message']['content'] ];

@@ -355,31 +355,17 @@ jQuery(function ($) {
 			.always(function () { $btn.prop('disabled', false).text('Validate Key'); });
 	});
 
-	// ── AI Chat Provider switcher (Settings tab) ──────────────────────────────
+	// ── AI Chat Model combined select (Settings tab) ─────────────────────────
 
 	const providers = cfg.providers || {};
 
-	function initProviderUI() {
-		const $providerSel = $('#sitechat_chat_provider');
-		if (!$providerSel.length) return;
+	function onCombinedModelChange() {
+		const $sel    = $('#sitechat_chat_model_combined');
+		if (!$sel.length) return;
 
-		const provider    = $providerSel.val();
-		const pCfg        = providers[provider] || {};
-		const savedModel  = cfg.currentChatModel || '';
-
-		// Rebuild model dropdown
-		const $modelSel = $('#sitechat_chat_model');
-		$modelSel.empty();
-		const models = pCfg.models || {};
-		Object.entries(models).forEach(function ([mid, mCfg]) {
-			const label = mCfg.label + (mCfg.free ? ' ⚡ Free' : '');
-			const $opt  = $('<option>').val(mid).text(label);
-			if (mid === savedModel) $opt.prop('selected', true);
-			$modelSel.append($opt);
-		});
-		if (!$modelSel.val() && $modelSel.find('option').length) {
-			$modelSel.find('option').first().prop('selected', true);
-		}
+		const val      = $sel.val() || '';
+		const provider = val.split('::')[0] || 'gemini';
+		const pCfg     = providers[provider] || {};
 
 		// Show/hide per-provider API key rows
 		$('.sitechat-provider-key-row').hide();
@@ -388,38 +374,40 @@ jQuery(function ($) {
 		// Show/hide Ollama URL row
 		$('#sitechat-ollama-url-row').toggle(provider === 'ollama');
 
-		// Update get-key link
-		const $linkWrap = $('#sitechat-provider-key-link-wrap');
-		if (pCfg.key_url && provider !== 'ollama') {
-			$linkWrap.html('<a href="' + escAttr(pCfg.key_url) + '" target="_blank" rel="noopener" class="button button-link">Get API Key →</a>');
+		// Update hint text
+		const $hint = $('#sitechat-provider-key-hint');
+		if (provider === 'gemini') {
+			$hint.text('Uses your Gemini API key above — no extra key needed.');
+		} else if (provider === 'ollama') {
+			$hint.text('Self-hosted — no API key required.');
+		} else if (pCfg.key_url) {
+			const freeNote = pCfg.has_free ? ' (free tier available)' : '';
+			$hint.html('Enter your ' + escHtml(pCfg.label) + ' API key below' + freeNote + '.');
 		} else {
-			$linkWrap.empty();
-		}
-
-		// Free tier badge
-		if (pCfg.has_free) {
-			$linkWrap.prepend('<span class="sitechat-badge sitechat-badge--green" style="margin-right:6px;">✦ Free tier</span>');
+			$hint.text('');
 		}
 	}
 
-	$('#sitechat_chat_provider').on('change', function () {
-		// Reset saved model hint so first option gets selected
-		cfg.currentChatModel = '';
-		initProviderUI();
-	});
+	$('#sitechat_chat_model_combined').on('change', onCombinedModelChange);
 
 	// Test chat provider connection
 	$('#sitechat-test-chat-provider').on('click', function () {
-		const $btn      = $(this).prop('disabled', true).text(s.validating || 'Validating…');
-		const provider  = $('#sitechat_chat_provider').val();
-		const $result   = $('#sitechat-chat-provider-result');
-		const pCfg      = providers[provider] || {};
-		const apiKey    = pCfg.needs_key ? ($('#sitechat_key_' + provider).val() || '').trim() : '';
-		const baseUrl   = provider === 'ollama' ? ($('#sitechat_ollama_base_url').val() || '').trim() : '';
+		const $btn     = $(this).prop('disabled', true).text(s.validating || 'Validating…');
+		const val      = $('#sitechat_chat_model_combined').val() || '';
+		const provider = val.split('::')[0] || 'gemini';
+		const $result  = $('#sitechat-chat-provider-result');
+		const pCfg     = providers[provider] || {};
+		const apiKey   = pCfg.needs_key ? ($('#sitechat_key_' + provider).val() || '').trim() : '';
+		const baseUrl  = provider === 'ollama' ? ($('#sitechat_ollama_base_url').val() || '').trim() : '';
+
+		// For gemini, use the embed key
+		const effectiveKey = provider === 'gemini'
+			? ($('#sitechat_gemini_api_key').val() || '').trim()
+			: apiKey;
 
 		$result.html('<span style="color:#6b7280;">Testing…</span>');
 
-		ajax('sitechat_validate_chat_provider', { provider, api_key: apiKey, base_url: baseUrl })
+		ajax('sitechat_validate_chat_provider', { provider, api_key: effectiveKey, base_url: baseUrl })
 			.done(function (res) {
 				const ok  = res.success;
 				const msg = (res.data && res.data.message) || (ok ? '✓ Connection OK' : '✗ Failed');
@@ -432,9 +420,9 @@ jQuery(function ($) {
 			.always(function () { $btn.prop('disabled', false).text('Test Connection'); });
 	});
 
-	// Run on load if on settings tab
+	// Initialise on settings tab load
 	if (tab === 'settings') {
-		initProviderUI();
+		onCombinedModelChange();
 	}
 
 	// ── Quick actions ─────────────────────────────────────────────────────────

@@ -6,10 +6,19 @@
 	<input type="hidden" name="sitechat_save_settings" value="1">
 	<input type="hidden" name="sitechat_tab" value="settings">
 
+	<?php
+	$providers    = SiteChat_AI_Provider::providers();
+	$cur_provider = $settings['sitechat_chat_provider'] ?: 'gemini';
+	$cur_model    = $settings['sitechat_chat_model']    ?: 'gemini-2.0-flash';
+	$cur_combined = $cur_provider . '::' . $cur_model;
+	?>
+
 	<div class="sitechat-card">
-		<div class="sitechat-card-header"><h2><?php esc_html_e( 'Gemini API Configuration', 'sitechat-ai' ); ?></h2></div>
+		<div class="sitechat-card-header"><h2><?php esc_html_e( 'AI Configuration', 'sitechat-ai' ); ?></h2></div>
 		<div class="sitechat-card-body">
 			<table class="form-table">
+
+				<!-- ── Gemini key (always required for indexing) ── -->
 				<tr>
 					<th><label for="sitechat_gemini_api_key"><?php esc_html_e( 'Gemini API Key', 'sitechat-ai' ); ?></label></th>
 					<td>
@@ -23,28 +32,28 @@
 							</button>
 						</div>
 						<p class="description">
+							<strong><?php esc_html_e( 'Always required', 'sitechat-ai' ); ?></strong>
 							<?php printf(
-								esc_html__( 'Get a free API key from %s. Both text-embedding-004 and gemini-2.0-flash are on the free tier.', 'sitechat-ai' ),
+								esc_html__( ' — used for content indexing. Free key at %s (no credit card needed).', 'sitechat-ai' ),
 								'<a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio</a>'
 							); ?>
 						</p>
-						<details class="sitechat-api-guide" style="margin-top:10px;">
-							<summary style="cursor:pointer;font-weight:600;color:#2563eb;"><?php esc_html_e( 'How to get a free API key — step by step', 'sitechat-ai' ); ?></summary>
+						<details class="sitechat-api-guide" style="margin-top:8px;">
+							<summary style="cursor:pointer;font-weight:600;color:#2563eb;"><?php esc_html_e( 'How to get a free Gemini API key — step by step', 'sitechat-ai' ); ?></summary>
 							<ol style="margin:10px 0 0 18px;line-height:1.8;">
 								<li><?php printf( esc_html__( 'Go to %s (no credit card required).', 'sitechat-ai' ), '<a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a>' ); ?></li>
 								<li><?php esc_html_e( 'Sign in with your Google account.', 'sitechat-ai' ); ?></li>
 								<li><?php esc_html_e( 'Click the blue "Create API key" button.', 'sitechat-ai' ); ?></li>
-								<li><?php esc_html_e( 'Choose "Create API key in new project" (or select an existing project).', 'sitechat-ai' ); ?></li>
+								<li><?php esc_html_e( 'Choose "Create API key in new project".', 'sitechat-ai' ); ?></li>
 								<li><?php esc_html_e( 'Copy the generated key (starts with "AIza…").', 'sitechat-ai' ); ?></li>
-								<li><?php esc_html_e( 'Paste it into the API key field above and click "Validate Key".', 'sitechat-ai' ); ?></li>
+								<li><?php esc_html_e( 'Paste it above and click "Validate Key".', 'sitechat-ai' ); ?></li>
 							</ol>
-							<p style="margin:8px 0 0;"><strong><?php esc_html_e( 'Free tier limits:', 'sitechat-ai' ); ?></strong>
-								<?php esc_html_e( 'text-embedding-004 — 1,500 requests/day · gemini-2.0-flash — 15 RPM / 1,500 requests/day', 'sitechat-ai' ); ?>
-							</p>
 						</details>
 						<div id="sitechat-test-result" style="margin-top:8px;"></div>
 					</td>
 				</tr>
+
+				<!-- ── Enable chatbot ── -->
 				<tr>
 					<th><?php esc_html_e( 'Enable Chatbot', 'sitechat-ai' ); ?></th>
 					<td>
@@ -53,74 +62,56 @@
 							       <?php checked( $settings['sitechat_enabled'], '1' ); ?>>
 							<?php esc_html_e( 'Enable the chatbot on the frontend', 'sitechat-ai' ); ?>
 						</label>
-						<p class="description"><?php esc_html_e( 'Requires a valid API key and at least one indexed document.', 'sitechat-ai' ); ?></p>
 					</td>
 				</tr>
-			</table>
-		</div>
-	</div>
 
-	<?php
-	$providers       = SiteChat_AI_Provider::providers();
-	$cur_provider    = $settings['sitechat_chat_provider'];
-	?>
-	<div class="sitechat-card">
-		<div class="sitechat-card-header">
-			<h2><?php esc_html_e( 'AI Chat Model', 'sitechat-ai' ); ?></h2>
-		</div>
-		<div class="sitechat-card-body">
-			<p class="description" style="margin-bottom:16px;">
-				<?php esc_html_e( 'Choose the AI provider and model that generates chat answers. Google Gemini (above) is always used for content indexing regardless of this setting.', 'sitechat-ai' ); ?>
-			</p>
-			<table class="form-table">
+				<!-- ── Section divider ── -->
 				<tr>
-					<th><label for="sitechat_chat_provider"><?php esc_html_e( 'Provider', 'sitechat-ai' ); ?></label></th>
+					<td colspan="2" style="padding:4px 0;">
+						<hr style="margin:8px 0;">
+						<p style="margin:0;font-weight:600;font-size:14px;"><?php esc_html_e( 'Chat Answer Model', 'sitechat-ai' ); ?></p>
+						<p class="description" style="margin:4px 0 0;">
+							<?php esc_html_e( 'Pick the AI model that generates answers. Gemini (above) always handles indexing regardless of this choice.', 'sitechat-ai' ); ?>
+						</p>
+					</td>
+				</tr>
+
+				<!-- ── Combined provider + model select ── -->
+				<tr>
+					<th><label for="sitechat_chat_model_combined"><?php esc_html_e( 'Chat Model', 'sitechat-ai' ); ?></label></th>
 					<td>
-						<select name="sitechat_chat_provider" id="sitechat_chat_provider" class="regular-text">
-							<?php foreach ( $providers as $pid => $pcfg ) : ?>
-							<option value="<?php echo esc_attr( $pid ); ?>" <?php selected( $cur_provider, $pid ); ?>>
-								<?php echo esc_html( $pcfg['label'] ); ?>
-								<?php if ( $pcfg['has_free'] ) : ?>(✦ Free tier)<?php endif; ?>
-							</option>
-							<?php endforeach; ?>
-						</select>
-						<span id="sitechat-provider-key-link-wrap" style="margin-left:10px;"></span>
+						<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px;">
+							<select name="sitechat_chat_model_combined" id="sitechat_chat_model_combined" style="min-width:320px;">
+								<?php foreach ( $providers as $pid => $pcfg ) : ?>
+								<optgroup label="<?php echo esc_attr( $pcfg['label'] . ( $pcfg['has_free'] ? ' ✦ Free' : '' ) ); ?>">
+									<?php foreach ( $pcfg['models'] as $mid => $mcfg ) : ?>
+									<option value="<?php echo esc_attr( $pid . '::' . $mid ); ?>"
+									        data-provider="<?php echo esc_attr( $pid ); ?>"
+									        <?php selected( $cur_combined, $pid . '::' . $mid ); ?>>
+										<?php echo esc_html( $mcfg['label'] . ( $mcfg['free'] ? ' ⚡' : '' ) ); ?>
+									</option>
+									<?php endforeach; ?>
+								</optgroup>
+								<?php endforeach; ?>
+							</select>
+							<button type="button" id="sitechat-test-chat-provider" class="button button-secondary">
+								<?php esc_html_e( 'Test Connection', 'sitechat-ai' ); ?>
+							</button>
+							<span id="sitechat-chat-provider-result" style="font-size:13px;"></span>
+						</div>
+						<p class="description" id="sitechat-provider-key-hint" style="margin:0;"></p>
 					</td>
 				</tr>
 
-				<tr>
-					<th><label for="sitechat_chat_model"><?php esc_html_e( 'Model', 'sitechat-ai' ); ?></label></th>
-					<td style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-						<select name="sitechat_chat_model" id="sitechat_chat_model" class="regular-text">
-							<?php foreach ( $providers[ $cur_provider ]['models'] as $mid => $mcfg ) : ?>
-							<option value="<?php echo esc_attr( $mid ); ?>"
-								<?php selected( $settings['sitechat_chat_model'], $mid ); ?>>
-								<?php echo esc_html( $mcfg['label'] ); ?>
-								<?php if ( $mcfg['free'] ) : ?> ⚡ Free<?php endif; ?>
-							</option>
-							<?php endforeach; ?>
-						</select>
-						<button type="button" id="sitechat-test-chat-provider" class="button button-secondary">
-							<?php esc_html_e( 'Test Connection', 'sitechat-ai' ); ?>
-						</button>
-						<span id="sitechat-chat-provider-result" style="font-size:13px;"></span>
-					</td>
-				</tr>
-
+				<!-- ── Per-provider API key rows (shown/hidden by JS) ── -->
 				<?php foreach ( $providers as $pid => $pcfg ) : ?>
-				<?php if ( $pcfg['needs_key'] && $pcfg['key_option'] ) : ?>
+				<?php if ( $pid === 'gemini' || ! $pcfg['needs_key'] || ! $pcfg['key_option'] ) : continue; endif; ?>
 				<tr class="sitechat-provider-key-row"
 				    data-provider="<?php echo esc_attr( $pid ); ?>"
 				    <?php if ( $cur_provider !== $pid ) : ?>style="display:none"<?php endif; ?>>
 					<th>
 						<label for="sitechat_key_<?php echo esc_attr( $pid ); ?>">
-							<?php
-							printf(
-								/* translators: %s provider label */
-								esc_html__( '%s API Key', 'sitechat-ai' ),
-								esc_html( $pcfg['label'] )
-							);
-							?>
+							<?php printf( esc_html__( '%s API Key', 'sitechat-ai' ), esc_html( $pcfg['label'] ) ); ?>
 						</label>
 					</th>
 					<td>
@@ -131,16 +122,15 @@
 						       class="large-text" autocomplete="off">
 						<p class="description">
 							<?php printf(
-								/* translators: %s link */
 								esc_html__( 'Get your key at %s', 'sitechat-ai' ),
 								'<a href="' . esc_url( $pcfg['key_url'] ) . '" target="_blank" rel="noopener">' . esc_html( $pcfg['key_url'] ) . '</a>'
 							); ?>
 						</p>
 					</td>
 				</tr>
-				<?php endif; ?>
 				<?php endforeach; ?>
 
+				<!-- ── Ollama URL (shown only for Ollama) ── -->
 				<tr id="sitechat-ollama-url-row" <?php if ( $cur_provider !== 'ollama' ) : ?>style="display:none"<?php endif; ?>>
 					<th><label for="sitechat_ollama_base_url"><?php esc_html_e( 'Ollama Server URL', 'sitechat-ai' ); ?></label></th>
 					<td>
@@ -148,11 +138,12 @@
 						       value="<?php echo esc_attr( $settings['sitechat_ollama_base_url'] ); ?>"
 						       class="regular-text" placeholder="http://localhost:11434">
 						<p class="description">
-							<?php esc_html_e( 'Base URL of your local Ollama instance. No API key needed.', 'sitechat-ai' ); ?>
+							<?php esc_html_e( 'Base URL of your Ollama instance. No API key needed.', 'sitechat-ai' ); ?>
 							<a href="https://ollama.com/" target="_blank" rel="noopener">ollama.com</a>
 						</p>
 					</td>
 				</tr>
+
 			</table>
 		</div>
 	</div>

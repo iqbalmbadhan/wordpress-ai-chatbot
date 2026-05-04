@@ -21,9 +21,7 @@ class SiteChat_Admin_Settings {
 			'sitechat_max_chunks_per_doc' => 'absint',
 			'sitechat_chat_max_history'   => 'absint',
 			'sitechat_rate_limit'         => 'absint',
-			// Chat provider selection
-			'sitechat_chat_provider'      => 'sanitize_key',
-			'sitechat_chat_model'         => 'sanitize_text_field',
+			// Ollama URL
 			'sitechat_ollama_base_url'    => 'sanitize_text_field',
 			// Per-provider API keys
 			'sitechat_openai_api_key'     => 'sanitize_text_field',
@@ -39,6 +37,14 @@ class SiteChat_Admin_Settings {
 			if ( isset( $_POST[ $key ] ) ) {
 				update_option( $key, $sanitizer( $_POST[ $key ] ) );
 			}
+		}
+
+		// Combined "provider::model" select → split into two options
+		if ( ! empty( $_POST['sitechat_chat_model_combined'] ) ) {
+			$combined = sanitize_text_field( wp_unslash( $_POST['sitechat_chat_model_combined'] ) );
+			$parts    = explode( '::', $combined, 2 );
+			update_option( 'sitechat_chat_provider', sanitize_key( $parts[0] ?? 'gemini' ) );
+			update_option( 'sitechat_chat_model',    sanitize_text_field( $parts[1] ?? 'gemini-2.0-flash' ) );
 		}
 
 		// Checkboxes
