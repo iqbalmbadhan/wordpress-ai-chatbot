@@ -397,25 +397,35 @@ jQuery(function ($) {
 		const provider = val.split('::')[0] || 'gemini';
 		const $result  = $('#sitechat-chat-provider-result');
 		const pCfg     = providers[provider] || {};
-		const apiKey   = pCfg.needs_key ? ($('#sitechat_key_' + provider).val() || '').trim() : '';
-		const baseUrl  = provider === 'ollama' ? ($('#sitechat_ollama_base_url').val() || '').trim() : '';
 
-		// For gemini, use the embed key
+		// For gemini use the shared embedding/chat key; for others use provider-specific key
 		const effectiveKey = provider === 'gemini'
 			? ($('#sitechat_gemini_api_key').val() || '').trim()
-			: apiKey;
+			: (pCfg.needs_key ? ($('#sitechat_key_' + provider).val() || '').trim() : '');
+		const baseUrl = provider === 'ollama' ? ($('#sitechat_ollama_base_url').val() || '').trim() : '';
 
-		$result.html('<span style="color:#6b7280;">Testing…</span>');
+		// Guard: require key before hitting the server
+		if ( pCfg.needs_key && !effectiveKey ) {
+			const label = provider === 'gemini' ? 'Gemini API key' : (pCfg.label || provider) + ' API key';
+			$result.html('<span style="color:#b45309;font-weight:600;">⚠ Please enter your ' + escHtml(label) + ' first.</span>');
+			$btn.prop('disabled', false).text('Test Connection');
+			return;
+		}
+
+		$result.html('<span style="color:#6b7280;">Testing connection…</span>');
 
 		ajax('sitechat_validate_chat_provider', { provider, api_key: effectiveKey, base_url: baseUrl })
 			.done(function (res) {
 				const ok  = res.success;
-				const msg = (res.data && res.data.message) || (ok ? '✓ Connection OK' : '✗ Failed');
+				const msg = (res.data && res.data.message) || (ok ? '✓ Connection OK' : '✗ Connection failed');
 				$result.html('<span style="color:' + (ok ? '#166534' : '#991b1b') + ';font-weight:600;">' + escHtml(msg) + '</span>');
 				toast(msg, ok ? 'success' : 'error');
 			})
-			.fail(function () {
-				$result.html('<span style="color:#991b1b;">Request failed.</span>');
+			.fail(function (xhr) {
+				const errMsg = (xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message)
+					|| 'Request failed — check your server or API key.';
+				$result.html('<span style="color:#991b1b;font-weight:600;">✗ ' + escHtml(errMsg) + '</span>');
+				toast(errMsg, 'error');
 			})
 			.always(function () { $btn.prop('disabled', false).text('Test Connection'); });
 	});

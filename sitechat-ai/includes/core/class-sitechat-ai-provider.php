@@ -264,42 +264,61 @@ class SiteChat_AI_Provider {
 	// ── Gemini ────────────────────────────────────────────────────────────────
 
 	private static function call_gemini( string $model, string $system_prompt, array $messages, string $api_key ): array|WP_Error {
-		$url      = 'https://generativelanguage.googleapis.com/v1/models/' . rawurlencode( $model ) . ':generateContent?key=' . rawurlencode( $api_key );
 		$contents = self::to_gemini_contents( $system_prompt, $messages );
-
-		$response = wp_remote_post( $url, [
-			'headers' => [ 'Content-Type' => 'application/json' ],
-			'body'    => wp_json_encode( [
-				'contents'         => $contents,
-				'generationConfig' => [ 'temperature' => 0.3, 'maxOutputTokens' => 1024, 'topP' => 0.8 ],
-			] ),
-			'timeout' => 45,
+		$body     = wp_json_encode( [
+			'contents'         => $contents,
+			'generationConfig' => [ 'temperature' => 0.3, 'maxOutputTokens' => 1024, 'topP' => 0.8 ],
 		] );
 
-		if ( is_wp_error( $response ) ) {
-			return $response;
+		$versions = self::gemini_versions();
+		$last_err = null;
+
+		foreach ( $versions as $version ) {
+			$url      = 'https://generativelanguage.googleapis.com/' . $version . '/models/'
+				. rawurlencode( $model ) . ':generateContent?key=' . rawurlencode( $api_key );
+			$response = wp_remote_post( $url, [
+				'headers' => [ 'Content-Type' => 'application/json' ],
+				'body'    => $body,
+				'timeout' => 45,
+			] );
+
+			if ( is_wp_error( $response ) ) {
+				$last_err = $response;
+				continue;
+			}
+
+			$code = wp_remote_retrieve_response_code( $response );
+			$data = json_decode( wp_remote_retrieve_body( $response ), true );
+
+			if ( $code === 200 && ! empty( $data['candidates'][0]['content']['parts'][0]['text'] ) ) {
+				update_option( 'sitechat_embed_api_version', $version );
+				return [ 'text' => $data['candidates'][0]['content']['parts'][0]['text'] ];
+			}
+
+			$last_err = new WP_Error(
+				'chat_failed',
+				$data['error']['message'] ?? 'Gemini API error',
+				[ 'status' => $code ]
+			);
 		}
 
-		$code = wp_remote_retrieve_response_code( $response );
-		$data = json_decode( wp_remote_retrieve_body( $response ), true );
-
-		if ( $code !== 200 || empty( $data['candidates'][0]['content']['parts'][0]['text'] ) ) {
-			return new WP_Error( 'chat_failed', $data['error']['message'] ?? 'Gemini API error', [ 'status' => $code ] );
-		}
-
-		return [ 'text' => $data['candidates'][0]['content']['parts'][0]['text'] ];
+		return $last_err ?? new WP_Error( 'chat_failed', 'Gemini API request failed.' );
 	}
 
 	private static function stream_gemini( string $model, string $system_prompt, array $messages, string $api_key ): void {
-		$url      = 'https://generativelanguage.googleapis.com/v1/models/' . rawurlencode( $model ) . ':streamGenerateContent?alt=sse&key=' . rawurlencode( $api_key );
 		$contents = self::to_gemini_contents( $system_prompt, $messages );
+		$body     = wp_json_encode( [
+			'contents'         => $contents,
+			'generationConfig' => [ 'temperature' => 0.3, 'maxOutputTokens' => 1024, 'topP' => 0.8 ],
+		] );
+
+		$version  = self::gemini_versions()[0]; // use cached/preferred version
+		$url      = 'https://generativelanguage.googleapis.com/' . $version . '/models/'
+			. rawurlencode( $model ) . ':streamGenerateContent?alt=sse&key=' . rawurlencode( $api_key );
 
 		$response = wp_remote_post( $url, [
 			'headers' => [ 'Content-Type' => 'application/json' ],
-			'body'    => wp_json_encode( [
-				'contents'         => $contents,
-				'generationConfig' => [ 'temperature' => 0.3, 'maxOutputTokens' => 1024, 'topP' => 0.8 ],
-			] ),
+			'body'    => $body,
 			'timeout' => 60,
 			'stream'  => true,
 		] );
@@ -488,6 +507,21 @@ class SiteChat_AI_Provider {
 	}
 
 	// ── Private helpers ───────────────────────────────────────────────────────
+
+	/**
+	 * Return Gemini API versions to try, cached winner first.
+	 * Shares the same cache key as the embeddings class.
+	 *
+	 * @return string[]
+	 */
+	private static function gemini_versions(): array {
+		$all    = [ 'v1', 'v1beta' ];
+		$cached = (string) get_option( 'sitechat_embed_api_version', '' );
+		if ( $cached && in_array( $cached, $all, true ) ) {
+			return array_merge( [ $cached ], array_diff( $all, [ $cached ] ) );
+		}
+		return $all;
+	}
 
 	private static function openai_endpoint( string $provider_id, string $base_url ): string {
 		return match ( $provider_id ) {

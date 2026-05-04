@@ -3,7 +3,7 @@
  * Plugin Name:       SiteChat AI
  * Plugin URI:        https://iqbalmahmud.com
  * Description:       AI-powered chatbot trained on your WordPress content. Answers visitor questions with accurate information and source links. Uses Google Gemini AI (free tier).
- * Version:           1.0.0
+ * Version:           1.1.0
  * Requires at least: 6.0
  * Requires PHP:      8.0
  * Author:            Md Iqbal Mahmud
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'SITECHAT_VERSION', '1.0.0' );
+define( 'SITECHAT_VERSION', '1.1.0' );
 define( 'SITECHAT_DB_VERSION', '1.0.0' );
 define( 'SITECHAT_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SITECHAT_PLUGIN_URL', plugin_dir_url( __FILE__ ) );

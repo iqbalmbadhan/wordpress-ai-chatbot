@@ -65,20 +65,9 @@
 					</td>
 				</tr>
 
-				<!-- ── Section divider ── -->
-				<tr>
-					<td colspan="2" style="padding:4px 0;">
-						<hr style="margin:8px 0;">
-						<p style="margin:0;font-weight:600;font-size:14px;"><?php esc_html_e( 'Chat Answer Model', 'sitechat-ai' ); ?></p>
-						<p class="description" style="margin:4px 0 0;">
-							<?php esc_html_e( 'Pick the AI model that generates answers. Gemini (above) always handles indexing regardless of this choice.', 'sitechat-ai' ); ?>
-						</p>
-					</td>
-				</tr>
-
 				<!-- ── Combined provider + model select ── -->
 				<tr>
-					<th><label for="sitechat_chat_model_combined"><?php esc_html_e( 'Chat Model', 'sitechat-ai' ); ?></label></th>
+					<th><label for="sitechat_chat_model_combined"><?php esc_html_e( 'Chat Answer Model', 'sitechat-ai' ); ?></label></th>
 					<td>
 						<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px;">
 							<select name="sitechat_chat_model_combined" id="sitechat_chat_model_combined" style="min-width:320px;">
@@ -97,9 +86,12 @@
 							<button type="button" id="sitechat-test-chat-provider" class="button button-secondary">
 								<?php esc_html_e( 'Test Connection', 'sitechat-ai' ); ?>
 							</button>
-							<span id="sitechat-chat-provider-result" style="font-size:13px;"></span>
 						</div>
-						<p class="description" id="sitechat-provider-key-hint" style="margin:0;"></p>
+						<div id="sitechat-chat-provider-result" style="font-size:13px;margin-bottom:4px;min-height:20px;"></div>
+						<p class="description" style="margin:0;">
+							<?php esc_html_e( 'All providers in one list. Gemini always handles content indexing — this setting only affects chat answers.', 'sitechat-ai' ); ?>
+						</p>
+						<p class="description" id="sitechat-provider-key-hint" style="margin:4px 0 0;"></p>
 					</td>
 				</tr>
 
