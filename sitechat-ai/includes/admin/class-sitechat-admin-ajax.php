@@ -18,6 +18,7 @@ class SiteChat_Admin_Ajax {
 	public function init(): void {
 		$actions = [
 			'sitechat_validate_api_key',
+			'sitechat_validate_chat_provider',
 			'sitechat_get_post_ids',
 			'sitechat_index_single',
 			'sitechat_exclude_post',
@@ -87,6 +88,45 @@ class SiteChat_Admin_Ajax {
 		} else {
 			wp_send_json_error( [ 'message' => $data['error']['message'] ?? __( 'Unknown error', 'sitechat-ai' ) ] );
 		}
+	}
+
+	// ── Chat provider validation ──────────────────────────────────────────────
+
+	public function handle_validate_chat_provider(): void {
+		$this->verify_nonce();
+
+		$provider_id = sanitize_key( $_POST['provider'] ?? get_option( 'sitechat_chat_provider', 'gemini' ) );
+		$provider    = SiteChat_AI_Provider::get_provider( $provider_id );
+
+		if ( ! $provider ) {
+			wp_send_json_error( [ 'message' => __( 'Unknown provider.', 'sitechat-ai' ) ] );
+		}
+
+		if ( $provider_id === 'ollama' ) {
+			$base_url = sanitize_text_field( $_POST['base_url'] ?? get_option( 'sitechat_ollama_base_url', 'http://localhost:11434' ) );
+			$result   = SiteChat_AI_Provider::validate( $provider_id, '', $base_url );
+		} else {
+			$api_key = sanitize_text_field( $_POST['api_key'] ?? '' );
+			if ( ! $api_key && $provider['key_option'] ) {
+				$api_key = (string) get_option( $provider['key_option'], '' );
+			}
+			if ( ! $api_key && $provider['needs_key'] ) {
+				wp_send_json_error( [ 'message' => __( 'No API key provided.', 'sitechat-ai' ) ] );
+			}
+			$result = SiteChat_AI_Provider::validate( $provider_id, $api_key );
+		}
+
+		if ( is_wp_error( $result ) ) {
+			wp_send_json_error( [ 'message' => $result->get_error_message() ] );
+		}
+
+		wp_send_json_success( [
+			'message' => sprintf(
+				/* translators: %s provider label */
+				__( '✓ %s connection successful!', 'sitechat-ai' ),
+				$provider['label']
+			),
+		] );
 	}
 
 	// ── Bulk indexing helpers ─────────────────────────────────────────────────
@@ -288,6 +328,10 @@ class SiteChat_Admin_Ajax {
 			'sitechat_slidein_width'      => 400,
 			'sitechat_show_on'            => 'all',
 			'sitechat_page_list'          => [],
+			// Chat provider
+			'sitechat_chat_provider'      => 'gemini',
+			'sitechat_chat_model'         => 'gemini-2.0-flash',
+			'sitechat_ollama_base_url'    => 'http://localhost:11434',
 		];
 
 		foreach ( $defaults as $key => $value ) {

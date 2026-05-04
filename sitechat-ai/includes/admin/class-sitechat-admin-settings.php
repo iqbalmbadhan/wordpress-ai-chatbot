@@ -12,13 +12,27 @@ class SiteChat_Admin_Settings {
 
 	public function save(): void {
 		$fields = [
+			// Gemini (embedding key — always required)
 			'sitechat_gemini_api_key'     => 'sanitize_text_field',
+			// General
 			'sitechat_system_prompt'      => 'sanitize_textarea_field',
 			'sitechat_chunk_size'         => 'absint',
 			'sitechat_chunk_overlap'      => 'absint',
 			'sitechat_max_chunks_per_doc' => 'absint',
 			'sitechat_chat_max_history'   => 'absint',
 			'sitechat_rate_limit'         => 'absint',
+			// Chat provider selection
+			'sitechat_chat_provider'      => 'sanitize_key',
+			'sitechat_chat_model'         => 'sanitize_text_field',
+			'sitechat_ollama_base_url'    => 'sanitize_text_field',
+			// Per-provider API keys
+			'sitechat_openai_api_key'     => 'sanitize_text_field',
+			'sitechat_anthropic_api_key'  => 'sanitize_text_field',
+			'sitechat_deepseek_api_key'   => 'sanitize_text_field',
+			'sitechat_groq_api_key'       => 'sanitize_text_field',
+			'sitechat_mistral_api_key'    => 'sanitize_text_field',
+			'sitechat_qwen_api_key'       => 'sanitize_text_field',
+			'sitechat_openrouter_api_key' => 'sanitize_text_field',
 		];
 
 		foreach ( $fields as $key => $sanitizer ) {
@@ -28,7 +42,7 @@ class SiteChat_Admin_Settings {
 		}
 
 		// Checkboxes
-		update_option( 'sitechat_enabled', isset( $_POST['sitechat_enabled'] ) ? '1' : '0' );
+		update_option( 'sitechat_enabled',    isset( $_POST['sitechat_enabled'] )    ? '1' : '0' );
 		update_option( 'sitechat_auto_index', isset( $_POST['sitechat_auto_index'] ) ? '1' : '0' );
 
 		// Index post types (array)
@@ -43,7 +57,6 @@ class SiteChat_Admin_Settings {
 			: [];
 		update_option( 'sitechat_excluded_ids', $excluded );
 
-		// Invalidate the public config cache (enabled status may have changed)
 		delete_transient( 'sitechat_config_cache' );
 	}
 
@@ -53,10 +66,26 @@ class SiteChat_Admin_Settings {
 			'sitechat_index_post_types', 'sitechat_excluded_ids', 'sitechat_max_chunks_per_doc',
 			'sitechat_chunk_size', 'sitechat_chunk_overlap', 'sitechat_chat_max_history',
 			'sitechat_rate_limit', 'sitechat_system_prompt',
+			// Chat provider
+			'sitechat_chat_provider', 'sitechat_chat_model', 'sitechat_ollama_base_url',
+			// Per-provider keys
+			'sitechat_openai_api_key', 'sitechat_anthropic_api_key', 'sitechat_deepseek_api_key',
+			'sitechat_groq_api_key', 'sitechat_mistral_api_key', 'sitechat_qwen_api_key',
+			'sitechat_openrouter_api_key',
 		];
 		$settings = [];
 		foreach ( $keys as $key ) {
 			$settings[ $key ] = get_option( $key );
+		}
+		// Defaults
+		if ( ! $settings['sitechat_chat_provider'] ) {
+			$settings['sitechat_chat_provider'] = 'gemini';
+		}
+		if ( ! $settings['sitechat_chat_model'] ) {
+			$settings['sitechat_chat_model'] = 'gemini-2.0-flash';
+		}
+		if ( ! $settings['sitechat_ollama_base_url'] ) {
+			$settings['sitechat_ollama_base_url'] = 'http://localhost:11434';
 		}
 		return $settings;
 	}

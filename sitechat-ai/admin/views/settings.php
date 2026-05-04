@@ -60,6 +60,103 @@
 		</div>
 	</div>
 
+	<?php
+	$providers       = SiteChat_AI_Provider::providers();
+	$cur_provider    = $settings['sitechat_chat_provider'];
+	?>
+	<div class="sitechat-card">
+		<div class="sitechat-card-header">
+			<h2><?php esc_html_e( 'AI Chat Model', 'sitechat-ai' ); ?></h2>
+		</div>
+		<div class="sitechat-card-body">
+			<p class="description" style="margin-bottom:16px;">
+				<?php esc_html_e( 'Choose the AI provider and model that generates chat answers. Google Gemini (above) is always used for content indexing regardless of this setting.', 'sitechat-ai' ); ?>
+			</p>
+			<table class="form-table">
+				<tr>
+					<th><label for="sitechat_chat_provider"><?php esc_html_e( 'Provider', 'sitechat-ai' ); ?></label></th>
+					<td>
+						<select name="sitechat_chat_provider" id="sitechat_chat_provider" class="regular-text">
+							<?php foreach ( $providers as $pid => $pcfg ) : ?>
+							<option value="<?php echo esc_attr( $pid ); ?>" <?php selected( $cur_provider, $pid ); ?>>
+								<?php echo esc_html( $pcfg['label'] ); ?>
+								<?php if ( $pcfg['has_free'] ) : ?>(✦ Free tier)<?php endif; ?>
+							</option>
+							<?php endforeach; ?>
+						</select>
+						<span id="sitechat-provider-key-link-wrap" style="margin-left:10px;"></span>
+					</td>
+				</tr>
+
+				<tr>
+					<th><label for="sitechat_chat_model"><?php esc_html_e( 'Model', 'sitechat-ai' ); ?></label></th>
+					<td style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+						<select name="sitechat_chat_model" id="sitechat_chat_model" class="regular-text">
+							<?php foreach ( $providers[ $cur_provider ]['models'] as $mid => $mcfg ) : ?>
+							<option value="<?php echo esc_attr( $mid ); ?>"
+								<?php selected( $settings['sitechat_chat_model'], $mid ); ?>>
+								<?php echo esc_html( $mcfg['label'] ); ?>
+								<?php if ( $mcfg['free'] ) : ?> ⚡ Free<?php endif; ?>
+							</option>
+							<?php endforeach; ?>
+						</select>
+						<button type="button" id="sitechat-test-chat-provider" class="button button-secondary">
+							<?php esc_html_e( 'Test Connection', 'sitechat-ai' ); ?>
+						</button>
+						<span id="sitechat-chat-provider-result" style="font-size:13px;"></span>
+					</td>
+				</tr>
+
+				<?php foreach ( $providers as $pid => $pcfg ) : ?>
+				<?php if ( $pcfg['needs_key'] && $pcfg['key_option'] ) : ?>
+				<tr class="sitechat-provider-key-row"
+				    data-provider="<?php echo esc_attr( $pid ); ?>"
+				    <?php if ( $cur_provider !== $pid ) : ?>style="display:none"<?php endif; ?>>
+					<th>
+						<label for="sitechat_key_<?php echo esc_attr( $pid ); ?>">
+							<?php
+							printf(
+								/* translators: %s provider label */
+								esc_html__( '%s API Key', 'sitechat-ai' ),
+								esc_html( $pcfg['label'] )
+							);
+							?>
+						</label>
+					</th>
+					<td>
+						<input type="password"
+						       id="sitechat_key_<?php echo esc_attr( $pid ); ?>"
+						       name="<?php echo esc_attr( $pcfg['key_option'] ); ?>"
+						       value="<?php echo esc_attr( (string) get_option( $pcfg['key_option'], '' ) ); ?>"
+						       class="large-text" autocomplete="off">
+						<p class="description">
+							<?php printf(
+								/* translators: %s link */
+								esc_html__( 'Get your key at %s', 'sitechat-ai' ),
+								'<a href="' . esc_url( $pcfg['key_url'] ) . '" target="_blank" rel="noopener">' . esc_html( $pcfg['key_url'] ) . '</a>'
+							); ?>
+						</p>
+					</td>
+				</tr>
+				<?php endif; ?>
+				<?php endforeach; ?>
+
+				<tr id="sitechat-ollama-url-row" <?php if ( $cur_provider !== 'ollama' ) : ?>style="display:none"<?php endif; ?>>
+					<th><label for="sitechat_ollama_base_url"><?php esc_html_e( 'Ollama Server URL', 'sitechat-ai' ); ?></label></th>
+					<td>
+						<input type="text" id="sitechat_ollama_base_url" name="sitechat_ollama_base_url"
+						       value="<?php echo esc_attr( $settings['sitechat_ollama_base_url'] ); ?>"
+						       class="regular-text" placeholder="http://localhost:11434">
+						<p class="description">
+							<?php esc_html_e( 'Base URL of your local Ollama instance. No API key needed.', 'sitechat-ai' ); ?>
+							<a href="https://ollama.com/" target="_blank" rel="noopener">ollama.com</a>
+						</p>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+
 	<div class="sitechat-card">
 		<div class="sitechat-card-header"><h2><?php esc_html_e( 'Indexing Settings', 'sitechat-ai' ); ?></h2></div>
 		<div class="sitechat-card-body">

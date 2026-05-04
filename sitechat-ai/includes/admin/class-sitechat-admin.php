@@ -87,13 +87,16 @@ class SiteChat_Admin {
 		$next_cron = wp_next_scheduled( 'sitechat_auto_reindex' );
 
 		wp_localize_script( 'sitechat-admin', 'sitechatAdmin', [
-			'ajaxUrl'   => admin_url( 'admin-ajax.php' ),
-			'nonce'     => wp_create_nonce( 'sitechat_admin_nonce' ),
-			'tab'       => $tab,
-			'chartData' => $chart_data,
-			'nextCron'  => $next_cron ? gmdate( 'Y-m-d H:i:s', $next_cron ) : '',
-			'pluginUrl' => SITECHAT_PLUGIN_URL,
-			'strings'   => [
+			'ajaxUrl'             => admin_url( 'admin-ajax.php' ),
+			'nonce'               => wp_create_nonce( 'sitechat_admin_nonce' ),
+			'tab'                 => $tab,
+			'chartData'           => $chart_data,
+			'nextCron'            => $next_cron ? gmdate( 'Y-m-d H:i:s', $next_cron ) : '',
+			'pluginUrl'           => SITECHAT_PLUGIN_URL,
+			'providers'           => SiteChat_AI_Provider::providers_for_js(),
+			'currentChatProvider' => (string) get_option( 'sitechat_chat_provider', 'gemini' ),
+			'currentChatModel'    => (string) get_option( 'sitechat_chat_model', 'gemini-2.0-flash' ),
+			'strings'             => [
 				'indexing'         => __( 'Indexing…', 'sitechat-ai' ),
 				'indexComplete'    => __( 'Indexing complete!', 'sitechat-ai' ),
 				'indexFailed'      => __( 'Indexing failed.', 'sitechat-ai' ),

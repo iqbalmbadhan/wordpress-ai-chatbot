@@ -30,6 +30,7 @@ require_once SITECHAT_PLUGIN_DIR . 'includes/class-sitechat-deactivator.php';
 require_once SITECHAT_PLUGIN_DIR . 'includes/core/class-sitechat-db.php';
 require_once SITECHAT_PLUGIN_DIR . 'includes/core/class-sitechat-indexer.php';
 require_once SITECHAT_PLUGIN_DIR . 'includes/core/class-sitechat-embeddings.php';
+require_once SITECHAT_PLUGIN_DIR . 'includes/core/class-sitechat-ai-provider.php';
 require_once SITECHAT_PLUGIN_DIR . 'includes/core/class-sitechat-search.php';
 require_once SITECHAT_PLUGIN_DIR . 'includes/core/class-sitechat-chat.php';
 require_once SITECHAT_PLUGIN_DIR . 'includes/core/class-sitechat-cron.php';
