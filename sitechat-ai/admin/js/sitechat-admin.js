@@ -341,11 +341,21 @@ jQuery(function ($) {
 	// ── API key: validate ─────────────────────────────────────────────────────
 
 	$('#sitechat-validate-key, #sitechat-test-api').on('click', function () {
-		const $btn    = $(this).prop('disabled', true).text(s.validating || 'Validating…');
-		const apiKey  = $('#sitechat_gemini_api_key').val().trim();
+		const $btn         = $(this).prop('disabled', true).text(s.validating || 'Validating…');
+		const embedProvider = $('#sitechat_embed_provider').val() || 'gemini';
+		const apiKey = embedProvider === 'openai'
+			? ($('#sitechat_key_openai').val() || '').trim()
+			: ($('#sitechat_gemini_api_key').val() || '').trim();
 		const $result = $('#sitechat-test-result');
 
-		ajax('sitechat_validate_api_key', { api_key: apiKey })
+		if (!apiKey) {
+			const label = embedProvider === 'openai' ? 'OpenAI API key' : 'Gemini API key';
+			$result.html('<span style="color:#b45309;font-weight:600;">⚠ Please enter your ' + escHtml(label) + ' first.</span>');
+			$btn.prop('disabled', false).text('Validate Key');
+			return;
+		}
+
+		ajax('sitechat_validate_api_key', { api_key: apiKey, embed_provider: embedProvider })
 			.done(function (res) {
 				const ok  = res.success;
 				const msg = (res.data && res.data.message) || (ok ? (s.valid || '✓ Valid!') : (s.invalid || '✗ Invalid'));
@@ -354,6 +364,28 @@ jQuery(function ($) {
 			})
 			.always(function () { $btn.prop('disabled', false).text('Validate Key'); });
 	});
+
+	// ── Embedding (indexing) provider selector ───────────────────────────────
+
+	var originalEmbedProvider = $('#sitechat_embed_provider').val() || 'gemini';
+
+	function onEmbedProviderChange() {
+		var ep        = $('#sitechat_embed_provider').val() || 'gemini';
+		var chatProv  = ($('#sitechat_chat_model_combined').val() || '').split('::')[0] || 'gemini';
+		var needGemini = ep === 'gemini' || chatProv === 'gemini';
+
+		$('#sitechat-gemini-key-row').toggle(needGemini);
+		$('#sitechat-embed-reindex-warn').toggle(ep !== originalEmbedProvider);
+
+		var $hint = $('#sitechat-embed-provider-hint');
+		if (ep === 'gemini') {
+			$hint.html('Uses your Gemini API key. <strong>Free</strong> — no credit card required.');
+		} else {
+			$hint.html('Uses your OpenAI API key (entered in the Chat Answer Model section below). <strong>Paid</strong> — charges apply per token.');
+		}
+	}
+
+	$('#sitechat_embed_provider').on('change', onEmbedProviderChange);
 
 	// ── AI Chat Model combined select (Settings tab) ─────────────────────────
 
@@ -373,6 +405,9 @@ jQuery(function ($) {
 
 		// Show/hide Ollama URL row
 		$('#sitechat-ollama-url-row').toggle(provider === 'ollama');
+
+		// Re-evaluate Gemini key row visibility (needed if embed provider = OpenAI but chat = Gemini)
+		if (typeof onEmbedProviderChange === 'function') onEmbedProviderChange();
 
 		// Update hint text
 		const $hint = $('#sitechat-provider-key-hint');
@@ -432,6 +467,7 @@ jQuery(function ($) {
 
 	// Initialise on settings tab load
 	if (tab === 'settings') {
+		onEmbedProviderChange();
 		onCombinedModelChange();
 	}
 

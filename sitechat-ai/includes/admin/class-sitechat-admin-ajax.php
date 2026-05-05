@@ -61,17 +61,49 @@ class SiteChat_Admin_Ajax {
 
 	public function handle_validate_api_key(): void {
 		$this->verify_nonce();
-		$api_key = sanitize_text_field( $_POST['api_key'] ?? get_option( 'sitechat_gemini_api_key', '' ) );
+
+		$embed_provider = sanitize_key( $_POST['embed_provider'] ?? get_option( 'sitechat_embed_provider', 'gemini' ) );
+		$api_key        = sanitize_text_field( $_POST['api_key'] ?? '' );
+
 		if ( ! $api_key ) {
 			wp_send_json_error( [ 'message' => __( 'No API key provided.', 'sitechat-ai' ) ] );
 		}
 
-		$body = wp_json_encode( [
+		if ( $embed_provider === 'openai' ) {
+			// Validate OpenAI embedding key
+			$resp = wp_remote_post( 'https://api.openai.com/v1/embeddings', [
+				'headers' => [
+					'Content-Type'  => 'application/json',
+					'Authorization' => 'Bearer ' . $api_key,
+				],
+				'body'    => wp_json_encode( [
+					'model'      => 'text-embedding-3-small',
+					'input'      => 'test',
+					'dimensions' => 768,
+				] ),
+				'timeout' => 15,
+			] );
+
+			if ( is_wp_error( $resp ) ) {
+				wp_send_json_error( [ 'message' => $resp->get_error_message() ] );
+			}
+
+			$code = wp_remote_retrieve_response_code( $resp );
+			$data = json_decode( wp_remote_retrieve_body( $resp ), true );
+
+			if ( $code === 200 && ! empty( $data['data'][0]['embedding'] ) ) {
+				wp_send_json_success( [ 'message' => __( 'OpenAI API key is valid. Embedding connection successful!', 'sitechat-ai' ) ] );
+			}
+
+			$msg = $data['error']['message'] ?? __( 'OpenAI API error.', 'sitechat-ai' );
+			wp_send_json_error( [ 'message' => $msg ] );
+		}
+
+		// Gemini embedding validation — try v1 then v1beta
+		$body     = wp_json_encode( [
 			'model'   => 'models/text-embedding-004',
 			'content' => [ 'parts' => [ [ 'text' => 'Test' ] ] ],
 		] );
-
-		// Try v1 then v1beta — which version works varies by account / region.
 		$versions   = [ 'v1', 'v1beta' ];
 		$cached_ver = (string) get_option( 'sitechat_embed_api_version', '' );
 		if ( $cached_ver && in_array( $cached_ver, $versions, true ) ) {
@@ -97,8 +129,8 @@ class SiteChat_Admin_Ajax {
 			$data = json_decode( wp_remote_retrieve_body( $resp ), true );
 
 			if ( $code === 200 && ! empty( $data['embedding']['values'] ) ) {
-				update_option( 'sitechat_embed_api_version', $version ); // cache winner
-				wp_send_json_success( [ 'message' => __( 'API key is valid. Connection successful!', 'sitechat-ai' ) ] );
+				update_option( 'sitechat_embed_api_version', $version );
+				wp_send_json_success( [ 'message' => __( 'Gemini API key is valid. Connection successful!', 'sitechat-ai' ) ] );
 			}
 
 			$last_error = $data['error']['message'] ?? __( 'Unknown error', 'sitechat-ai' );
@@ -345,6 +377,8 @@ class SiteChat_Admin_Ajax {
 			'sitechat_slidein_width'      => 400,
 			'sitechat_show_on'            => 'all',
 			'sitechat_page_list'          => [],
+			// Embedding provider
+			'sitechat_embed_provider'     => 'gemini',
 			// Chat provider
 			'sitechat_chat_provider'      => 'gemini',
 			'sitechat_chat_model'         => 'gemini-2.0-flash',
