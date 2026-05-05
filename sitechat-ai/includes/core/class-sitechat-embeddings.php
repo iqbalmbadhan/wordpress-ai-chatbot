@@ -228,7 +228,7 @@ class SiteChat_Embeddings {
 
 			$last_err = new WP_Error(
 				'embed_failed',
-				$data['error']['message'] ?? 'Unknown Gemini API error',
+				self::gemini_friendly_error( $data['error']['message'] ?? 'Unknown Gemini API error', $code ),
 				[ 'status' => $code ]
 			);
 		}
@@ -299,7 +299,7 @@ class SiteChat_Embeddings {
 			$data = json_decode( wp_remote_retrieve_body( $response ), true );
 
 			if ( $code === 429 ) {
-				return new WP_Error( 'rate_limited', 'Gemini API rate limit reached. Will retry.', [ 'status' => 429 ] );
+				return new WP_Error( 'rate_limited', self::gemini_friendly_error( 'Quota exceeded', 429 ), [ 'status' => 429 ] );
 			}
 
 			if ( $code === 200 && ! empty( $data['embeddings'] ) ) {
@@ -312,7 +312,7 @@ class SiteChat_Embeddings {
 
 			$last_err = new WP_Error(
 				'embed_batch_failed',
-				$data['error']['message'] ?? 'Unknown Gemini batch embed error',
+				self::gemini_friendly_error( $data['error']['message'] ?? 'Unknown Gemini batch embed error', $code ),
 				[ 'status' => $code ]
 			);
 		}
@@ -321,6 +321,27 @@ class SiteChat_Embeddings {
 	}
 
 	// ── Helpers ───────────────────────────────────────────────────────────────
+
+	/**
+	 * Turn raw Gemini API error messages into actionable user guidance.
+	 */
+	private static function gemini_friendly_error( string $raw, int $code ): string {
+		$lower = strtolower( $raw );
+
+		if ( $code === 429 || str_contains( $lower, 'quota' ) || str_contains( $lower, 'rate' ) ) {
+			return 'Gemini free-tier quota exceeded. Fix: go to Settings → AI Model and switch to an OpenAI model, or wait for your quota to reset (usually 24 h). Details: ' . $raw;
+		}
+
+		if ( str_contains( $lower, 'not found' ) || str_contains( $lower, 'not supported' ) ) {
+			return 'Gemini embedding model unavailable on your account. Fix: go to Settings → "Index Content With" and select OpenAI, or switch your AI Model to an OpenAI model. Details: ' . $raw;
+		}
+
+		if ( str_contains( $lower, 'api key' ) || str_contains( $lower, 'invalid' ) || $code === 403 ) {
+			return 'Gemini API key invalid or missing. Fix: go to Settings → Gemini API Key and enter a valid key, or switch to OpenAI. Details: ' . $raw;
+		}
+
+		return $raw;
+	}
 
 	private function ordered_versions(): array {
 		$cached   = (string) get_option( 'sitechat_embed_api_version', '' );
