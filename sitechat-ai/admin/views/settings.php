@@ -7,13 +7,15 @@
 	<input type="hidden" name="sitechat_tab" value="settings">
 
 	<?php
-	$providers    = SiteChat_AI_Provider::providers();
-	$cur_provider = $settings['sitechat_chat_provider'] ?: 'gemini';
-	$cur_model    = $settings['sitechat_chat_model']    ?: 'gemini-2.0-flash';
-	$cur_combined = $cur_provider . '::' . $cur_model;
-
-	// Gemini key row: hide only when OpenAI is the chat provider (OpenAI handles indexing too)
-	$gemini_row_hidden = ( $cur_provider === 'openai' );
+	$providers         = SiteChat_AI_Provider::providers();
+	$cur_provider      = $settings['sitechat_chat_provider'] ?: 'gemini';
+	$cur_model         = $settings['sitechat_chat_model']    ?: 'gemini-2.0-flash';
+	$cur_combined      = $cur_provider . '::' . $cur_model;
+	$native_embed      = in_array( $cur_provider, [ 'gemini', 'openai' ], true );
+	$cur_index_prov    = $settings['sitechat_index_provider']
+		?: ( get_option( 'sitechat_openai_api_key', '' ) ? 'openai' : 'gemini' );
+	$gemini_row_hidden = ( $cur_provider === 'openai' )
+		|| ( ! $native_embed && $cur_index_prov === 'openai' );
 	?>
 
 	<div class="sitechat-card">
@@ -45,6 +47,26 @@
 						</div>
 						<div id="sitechat-chat-provider-result" style="font-size:13px;margin-bottom:4px;min-height:20px;"></div>
 						<p class="description" id="sitechat-model-hint" style="margin:0;"></p>
+					</td>
+				</tr>
+
+				<!-- ── Index-provider toggle — only for providers without native embeddings ── -->
+				<tr id="sitechat-index-provider-row" <?php if ( $native_embed ) : ?>style="display:none"<?php endif; ?>>
+					<th><?php esc_html_e( 'Index Content With', 'sitechat-ai' ); ?></th>
+					<td>
+						<label style="margin-right:16px;">
+							<input type="radio" name="sitechat_index_provider" value="openai"
+							       <?php checked( $cur_index_prov, 'openai' ); ?>>
+							<?php esc_html_e( 'OpenAI (text-embedding-3-small)', 'sitechat-ai' ); ?>
+						</label>
+						<label>
+							<input type="radio" name="sitechat_index_provider" value="gemini"
+							       <?php checked( $cur_index_prov, 'gemini' ); ?>>
+							<?php esc_html_e( 'Gemini (text-embedding-004, free)', 'sitechat-ai' ); ?>
+						</label>
+						<p class="description" style="margin-top:4px;">
+							<?php esc_html_e( 'Your selected chat provider has no embedding API. Choose which service indexes your content for search.', 'sitechat-ai' ); ?>
+						</p>
 					</td>
 				</tr>
 

@@ -370,45 +370,65 @@ jQuery(function ($) {
 	// Providers that handle their own embeddings (one key = everything)
 	const EMBED_SELF = { gemini: true, openai: true };
 
+	function indexProvider() {
+		return $('input[name="sitechat_index_provider"]:checked').val() || 'openai';
+	}
+
+	function updateKeyRows(chatProvider) {
+		const ip = indexProvider();
+
+		// Per-provider chat key rows
+		$('.sitechat-provider-key-row').hide();
+		if (chatProvider !== 'gemini') {
+			$('.sitechat-provider-key-row[data-provider="' + chatProvider + '"]').show();
+		}
+
+		// Ollama URL
+		$('#sitechat-ollama-url-row').toggle(chatProvider === 'ollama');
+
+		// Index-provider radio row — only for providers without native embeddings
+		const nativeEmbed = (chatProvider === 'gemini' || chatProvider === 'openai');
+		$('#sitechat-index-provider-row').toggle(!nativeEmbed);
+
+		// Gemini key row visibility
+		const needGemini = chatProvider === 'gemini'
+			|| (!nativeEmbed && ip === 'gemini');
+		$('#sitechat-gemini-key-row').toggle(needGemini);
+
+		// Hints
+		const $modelHint  = $('#sitechat-model-hint');
+		const $geminiDesc = $('#sitechat-gemini-key-desc');
+		const pCfg        = providers[chatProvider] || {};
+
+		if (chatProvider === 'gemini') {
+			$modelHint.html('✦ <strong>Free</strong> — one Gemini API key handles both chat and content indexing.');
+			$geminiDesc.html('Used for both <strong>chat answers</strong> and <strong>content indexing</strong>. Free at <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio</a>.');
+		} else if (chatProvider === 'openai') {
+			$modelHint.html('One OpenAI API key handles both chat and content indexing.');
+		} else {
+			const freeNote = pCfg.has_free ? ' ✦ Free tier available' : '';
+			const indexNote = ip === 'openai'
+				? 'Content indexed via <strong>OpenAI</strong> (uses your OpenAI key).'
+				: 'Content indexed via <strong>Gemini</strong> (free). Enter Gemini key below.';
+			$modelHint.html(escHtml((pCfg.label || chatProvider) + freeNote) + ' — enter API key below. ' + indexNote);
+			if (ip === 'gemini') {
+				$geminiDesc.html('Required for <strong>content indexing</strong>. Free at <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio</a>.');
+			}
+		}
+	}
+
 	function onCombinedModelChange() {
 		const $sel = $('#sitechat_chat_model_combined');
 		if (!$sel.length) return;
-
-		const val      = $sel.val() || '';
-		const provider = val.split('::')[0] || 'gemini';
-		const pCfg     = providers[provider] || {};
-
-		// Show/hide per-provider API key rows
-		$('.sitechat-provider-key-row').hide();
-		if (provider !== 'gemini') {
-			$('.sitechat-provider-key-row[data-provider="' + provider + '"]').show();
-		}
-
-		// Show/hide Ollama URL row
-		$('#sitechat-ollama-url-row').toggle(provider === 'ollama');
-
-		// Gemini key row: hide only when OpenAI is selected (OpenAI handles indexing too)
-		$('#sitechat-gemini-key-row').toggle(provider !== 'openai');
-
-		// Model hint + Gemini key description
-		const $modelHint  = $('#sitechat-model-hint');
-		const $geminiDesc = $('#sitechat-gemini-key-desc');
-
-		if (provider === 'gemini') {
-			$modelHint.html('✦ <strong>Free</strong> — one Gemini API key handles both chat and content indexing.');
-			$geminiDesc.html('Used for both <strong>chat answers</strong> and <strong>content indexing</strong>. Free at <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio</a>.');
-		} else if (provider === 'openai') {
-			$modelHint.html('One OpenAI API key handles both chat and content indexing.');
-			$geminiDesc.text(''); // Gemini row hidden
-		} else if (provider === 'ollama') {
-			$modelHint.html('Self-hosted — no cloud API key needed for chat. A <strong>free Gemini key</strong> is still required for content indexing.');
-			$geminiDesc.html('Required for <strong>content indexing</strong> (Ollama doesn\'t support embeddings). Free at <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio</a>.');
-		} else {
-			const freeNote = pCfg.has_free ? ' (free tier available)' : '';
-			$modelHint.html('Enter your ' + escHtml(pCfg.label || provider) + ' API key below' + freeNote + '. A <strong>free Gemini key</strong> is also required for content indexing.');
-			$geminiDesc.html('Required for <strong>content indexing</strong>. Free at <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio</a>.');
-		}
+		const provider = ($sel.val() || '').split('::')[0] || 'gemini';
+		updateKeyRows(provider);
 	}
+
+	// Re-run key row logic when index-provider radio changes
+	$(document).on('change', 'input[name="sitechat_index_provider"]', function () {
+		const provider = ($('#sitechat_chat_model_combined').val() || '').split('::')[0] || 'gemini';
+		updateKeyRows(provider);
+	});
 
 	$('#sitechat_chat_model_combined').on('change', onCombinedModelChange);
 

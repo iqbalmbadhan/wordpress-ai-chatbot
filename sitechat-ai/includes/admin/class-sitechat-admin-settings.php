@@ -39,6 +39,11 @@ class SiteChat_Admin_Settings {
 			}
 		}
 
+		// Indexing provider for non-native-embedding chat providers
+		if ( isset( $_POST['sitechat_index_provider'] ) ) {
+			update_option( 'sitechat_index_provider', sanitize_key( $_POST['sitechat_index_provider'] ) );
+		}
+
 		// Combined "provider::model" select → split into two options
 		if ( ! empty( $_POST['sitechat_chat_model_combined'] ) ) {
 			$combined = sanitize_text_field( wp_unslash( $_POST['sitechat_chat_model_combined'] ) );
@@ -72,7 +77,8 @@ class SiteChat_Admin_Settings {
 			'sitechat_index_post_types', 'sitechat_excluded_ids', 'sitechat_max_chunks_per_doc',
 			'sitechat_chunk_size', 'sitechat_chunk_overlap', 'sitechat_chat_max_history',
 			'sitechat_rate_limit', 'sitechat_system_prompt',
-			// Chat provider
+			// Indexing + Chat provider
+			'sitechat_index_provider',
 			'sitechat_chat_provider', 'sitechat_chat_model', 'sitechat_ollama_base_url',
 			// Per-provider keys
 			'sitechat_openai_api_key', 'sitechat_anthropic_api_key', 'sitechat_deepseek_api_key',

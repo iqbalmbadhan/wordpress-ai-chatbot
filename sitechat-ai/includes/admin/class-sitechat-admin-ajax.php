@@ -62,9 +62,14 @@ class SiteChat_Admin_Ajax {
 	public function handle_validate_api_key(): void {
 		$this->verify_nonce();
 
-		// Derive embedding provider from the current chat provider (same logic as SiteChat_Embeddings)
-		$chat_provider  = sanitize_key( $_POST['chat_provider'] ?? get_option( 'sitechat_chat_provider', 'gemini' ) );
-		$embed_provider = in_array( $chat_provider, [ 'gemini', 'openai' ], true ) ? $chat_provider : 'gemini';
+		// Mirror SiteChat_Embeddings::provider() logic
+		$chat_provider = sanitize_key( $_POST['chat_provider'] ?? get_option( 'sitechat_chat_provider', 'gemini' ) );
+		if ( in_array( $chat_provider, [ 'gemini', 'openai' ], true ) ) {
+			$embed_provider = $chat_provider;
+		} else {
+			$stored = (string) get_option( 'sitechat_index_provider', '' );
+			$embed_provider = $stored ?: ( get_option( 'sitechat_openai_api_key', '' ) ? 'openai' : 'gemini' );
+		}
 		$api_key        = sanitize_text_field( $_POST['api_key'] ?? '' );
 
 		if ( ! $api_key ) {
@@ -379,8 +384,8 @@ class SiteChat_Admin_Ajax {
 			'sitechat_slidein_width'      => 400,
 			'sitechat_show_on'            => 'all',
 			'sitechat_page_list'          => [],
-			// Embedding provider
-			'sitechat_embed_provider'     => 'gemini',
+			// Indexing fallback provider (for non-native-embed chat providers)
+			'sitechat_index_provider'     => '',
 			// Chat provider
 			'sitechat_chat_provider'      => 'gemini',
 			'sitechat_chat_model'         => 'gemini-2.0-flash',
