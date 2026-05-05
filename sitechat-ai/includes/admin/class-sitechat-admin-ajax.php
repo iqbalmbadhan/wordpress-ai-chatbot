@@ -62,7 +62,9 @@ class SiteChat_Admin_Ajax {
 	public function handle_validate_api_key(): void {
 		$this->verify_nonce();
 
-		$embed_provider = sanitize_key( $_POST['embed_provider'] ?? get_option( 'sitechat_embed_provider', 'gemini' ) );
+		// Derive embedding provider from the current chat provider (same logic as SiteChat_Embeddings)
+		$chat_provider  = sanitize_key( $_POST['chat_provider'] ?? get_option( 'sitechat_chat_provider', 'gemini' ) );
+		$embed_provider = in_array( $chat_provider, [ 'gemini', 'openai' ], true ) ? $chat_provider : 'gemini';
 		$api_key        = sanitize_text_field( $_POST['api_key'] ?? '' );
 
 		if ( ! $api_key ) {

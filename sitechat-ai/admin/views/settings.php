@@ -7,11 +7,13 @@
 	<input type="hidden" name="sitechat_tab" value="settings">
 
 	<?php
-	$providers        = SiteChat_AI_Provider::providers();
-	$cur_provider     = $settings['sitechat_chat_provider'] ?: 'gemini';
-	$cur_model        = $settings['sitechat_chat_model']    ?: 'gemini-2.0-flash';
-	$cur_combined     = $cur_provider . '::' . $cur_model;
-	$cur_embed        = $settings['sitechat_embed_provider'] ?: 'gemini';
+	$providers    = SiteChat_AI_Provider::providers();
+	$cur_provider = $settings['sitechat_chat_provider'] ?: 'gemini';
+	$cur_model    = $settings['sitechat_chat_model']    ?: 'gemini-2.0-flash';
+	$cur_combined = $cur_provider . '::' . $cur_model;
+
+	// Gemini key row: hide only when OpenAI is the chat provider (OpenAI handles indexing too)
+	$gemini_row_hidden = ( $cur_provider === 'openai' );
 	?>
 
 	<div class="sitechat-card">
@@ -19,77 +21,12 @@
 		<div class="sitechat-card-body">
 			<table class="form-table">
 
-				<!-- ── Indexing (embedding) provider ── -->
+				<!-- ── ONE model dropdown — controls both chat and indexing ── -->
 				<tr>
-					<th><label for="sitechat_embed_provider"><?php esc_html_e( 'Indexing Provider', 'sitechat-ai' ); ?></label></th>
-					<td>
-						<select name="sitechat_embed_provider" id="sitechat_embed_provider">
-							<option value="gemini" <?php selected( $cur_embed, 'gemini' ); ?>>
-								<?php esc_html_e( 'Gemini (Free) — text-embedding-004', 'sitechat-ai' ); ?>
-							</option>
-							<option value="openai" <?php selected( $cur_embed, 'openai' ); ?>>
-								<?php esc_html_e( 'OpenAI — text-embedding-3-small', 'sitechat-ai' ); ?>
-							</option>
-						</select>
-						<p class="description" id="sitechat-embed-provider-hint" style="margin:6px 0 0;"></p>
-						<p class="description" style="margin:4px 0 0;color:#b45309;" id="sitechat-embed-reindex-warn" style="display:none;">
-							<?php esc_html_e( '⚠ Changing the indexing provider clears your existing index. You must re-index all content after saving.', 'sitechat-ai' ); ?>
-						</p>
-					</td>
-				</tr>
-
-				<!-- ── Gemini API key ── -->
-				<tr id="sitechat-gemini-key-row" <?php if ( $cur_embed !== 'gemini' && $cur_provider !== 'gemini' ) : ?>style="display:none"<?php endif; ?>>
-					<th><label for="sitechat_gemini_api_key"><?php esc_html_e( 'Gemini API Key', 'sitechat-ai' ); ?></label></th>
-					<td>
-						<div class="sitechat-api-key-row">
-							<input type="password" id="sitechat_gemini_api_key" name="sitechat_gemini_api_key"
-							       value="<?php echo esc_attr( $settings['sitechat_gemini_api_key'] ); ?>"
-							       class="large-text" autocomplete="off">
-							<button type="button" id="sitechat-toggle-key" class="button"><?php esc_html_e( 'Show', 'sitechat-ai' ); ?></button>
-							<button type="button" id="sitechat-validate-key" class="button button-secondary">
-								<?php esc_html_e( 'Validate Key', 'sitechat-ai' ); ?>
-							</button>
-						</div>
-						<p class="description" id="sitechat-gemini-key-desc">
-							<?php printf(
-								esc_html__( 'Free key at %s (no credit card needed).', 'sitechat-ai' ),
-								'<a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio</a>'
-							); ?>
-						</p>
-						<details class="sitechat-api-guide" style="margin-top:8px;">
-							<summary style="cursor:pointer;font-weight:600;color:#2563eb;"><?php esc_html_e( 'How to get a free Gemini API key — step by step', 'sitechat-ai' ); ?></summary>
-							<ol style="margin:10px 0 0 18px;line-height:1.8;">
-								<li><?php printf( esc_html__( 'Go to %s (no credit card required).', 'sitechat-ai' ), '<a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a>' ); ?></li>
-								<li><?php esc_html_e( 'Sign in with your Google account.', 'sitechat-ai' ); ?></li>
-								<li><?php esc_html_e( 'Click the blue "Create API key" button.', 'sitechat-ai' ); ?></li>
-								<li><?php esc_html_e( 'Choose "Create API key in new project".', 'sitechat-ai' ); ?></li>
-								<li><?php esc_html_e( 'Copy the generated key (starts with "AIza…").', 'sitechat-ai' ); ?></li>
-								<li><?php esc_html_e( 'Paste it above and click "Validate Key".', 'sitechat-ai' ); ?></li>
-							</ol>
-						</details>
-						<div id="sitechat-test-result" style="margin-top:8px;"></div>
-					</td>
-				</tr>
-
-				<!-- ── Enable chatbot ── -->
-				<tr>
-					<th><?php esc_html_e( 'Enable Chatbot', 'sitechat-ai' ); ?></th>
-					<td>
-						<label>
-							<input type="checkbox" name="sitechat_enabled" value="1"
-							       <?php checked( $settings['sitechat_enabled'], '1' ); ?>>
-							<?php esc_html_e( 'Enable the chatbot on the frontend', 'sitechat-ai' ); ?>
-						</label>
-					</td>
-				</tr>
-
-				<!-- ── Combined provider + model select ── -->
-				<tr>
-					<th><label for="sitechat_chat_model_combined"><?php esc_html_e( 'Chat Answer Model', 'sitechat-ai' ); ?></label></th>
+					<th><label for="sitechat_chat_model_combined"><?php esc_html_e( 'AI Model', 'sitechat-ai' ); ?></label></th>
 					<td>
 						<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px;">
-							<select name="sitechat_chat_model_combined" id="sitechat_chat_model_combined" style="min-width:320px;">
+							<select name="sitechat_chat_model_combined" id="sitechat_chat_model_combined" style="min-width:340px;">
 								<?php foreach ( $providers as $pid => $pcfg ) : ?>
 								<optgroup label="<?php echo esc_attr( $pcfg['label'] . ( $pcfg['has_free'] ? ' ✦ Free' : '' ) ); ?>">
 									<?php foreach ( $pcfg['models'] as $mid => $mcfg ) : ?>
@@ -107,10 +44,46 @@
 							</button>
 						</div>
 						<div id="sitechat-chat-provider-result" style="font-size:13px;margin-bottom:4px;min-height:20px;"></div>
-						<p class="description" style="margin:0;">
-							<?php esc_html_e( 'All providers in one list. Gemini always handles content indexing — this setting only affects chat answers.', 'sitechat-ai' ); ?>
-						</p>
-						<p class="description" id="sitechat-provider-key-hint" style="margin:4px 0 0;"></p>
+						<p class="description" id="sitechat-model-hint" style="margin:0;"></p>
+					</td>
+				</tr>
+
+				<!-- ── Gemini API key — hidden when OpenAI handles both chat + indexing ── -->
+				<tr id="sitechat-gemini-key-row" <?php if ( $gemini_row_hidden ) : ?>style="display:none"<?php endif; ?>>
+					<th><label for="sitechat_gemini_api_key"><?php esc_html_e( 'Gemini API Key', 'sitechat-ai' ); ?></label></th>
+					<td>
+						<div class="sitechat-api-key-row">
+							<input type="password" id="sitechat_gemini_api_key" name="sitechat_gemini_api_key"
+							       value="<?php echo esc_attr( $settings['sitechat_gemini_api_key'] ); ?>"
+							       class="large-text" autocomplete="off">
+							<button type="button" id="sitechat-toggle-key" class="button"><?php esc_html_e( 'Show', 'sitechat-ai' ); ?></button>
+							<button type="button" id="sitechat-validate-key" class="button button-secondary">
+								<?php esc_html_e( 'Validate Key', 'sitechat-ai' ); ?>
+							</button>
+						</div>
+						<p class="description" id="sitechat-gemini-key-desc"></p>
+						<details class="sitechat-api-guide" style="margin-top:8px;">
+							<summary style="cursor:pointer;font-weight:600;color:#2563eb;"><?php esc_html_e( 'How to get a free Gemini API key', 'sitechat-ai' ); ?></summary>
+							<ol style="margin:10px 0 0 18px;line-height:1.8;">
+								<li><?php printf( esc_html__( 'Go to %s (no credit card required).', 'sitechat-ai' ), '<a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a>' ); ?></li>
+								<li><?php esc_html_e( 'Sign in with your Google account.', 'sitechat-ai' ); ?></li>
+								<li><?php esc_html_e( 'Click "Create API key" and copy it.', 'sitechat-ai' ); ?></li>
+								<li><?php esc_html_e( 'Paste it above and click "Validate Key".', 'sitechat-ai' ); ?></li>
+							</ol>
+						</details>
+						<div id="sitechat-test-result" style="margin-top:8px;"></div>
+					</td>
+				</tr>
+
+				<!-- ── Enable chatbot ── -->
+				<tr>
+					<th><?php esc_html_e( 'Enable Chatbot', 'sitechat-ai' ); ?></th>
+					<td>
+						<label>
+							<input type="checkbox" name="sitechat_enabled" value="1"
+							       <?php checked( $settings['sitechat_enabled'], '1' ); ?>>
+							<?php esc_html_e( 'Enable the chatbot on the frontend', 'sitechat-ai' ); ?>
+						</label>
 					</td>
 				</tr>
 

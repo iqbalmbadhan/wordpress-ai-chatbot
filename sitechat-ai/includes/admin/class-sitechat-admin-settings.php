@@ -39,23 +39,6 @@ class SiteChat_Admin_Settings {
 			}
 		}
 
-		// Embedding provider — clear index when changed (vectors are provider-specific)
-		if ( ! empty( $_POST['sitechat_embed_provider'] ) ) {
-			$new_provider = sanitize_key( $_POST['sitechat_embed_provider'] );
-			$old_provider = (string) get_option( 'sitechat_embed_provider', 'gemini' );
-			update_option( 'sitechat_embed_provider', $new_provider );
-			if ( $new_provider !== $old_provider ) {
-				global $wpdb;
-				$db = new SiteChat_DB();
-				$wpdb->query( "TRUNCATE TABLE {$db->chunks}" );
-				$wpdb->query( "TRUNCATE TABLE {$db->documents}" );
-				delete_transient( 'sitechat_embeddings_cache' );
-				update_option( 'sitechat_total_indexed', 0 );
-				update_option( 'sitechat_total_chunks', 0 );
-				delete_option( 'sitechat_embed_api_version' );
-			}
-		}
-
 		// Combined "provider::model" select → split into two options
 		if ( ! empty( $_POST['sitechat_chat_model_combined'] ) ) {
 			$combined = sanitize_text_field( wp_unslash( $_POST['sitechat_chat_model_combined'] ) );
@@ -89,8 +72,6 @@ class SiteChat_Admin_Settings {
 			'sitechat_index_post_types', 'sitechat_excluded_ids', 'sitechat_max_chunks_per_doc',
 			'sitechat_chunk_size', 'sitechat_chunk_overlap', 'sitechat_chat_max_history',
 			'sitechat_rate_limit', 'sitechat_system_prompt',
-			// Embedding
-			'sitechat_embed_provider',
 			// Chat provider
 			'sitechat_chat_provider', 'sitechat_chat_model', 'sitechat_ollama_base_url',
 			// Per-provider keys
@@ -103,9 +84,6 @@ class SiteChat_Admin_Settings {
 			$settings[ $key ] = get_option( $key );
 		}
 		// Defaults
-		if ( ! $settings['sitechat_embed_provider'] ) {
-			$settings['sitechat_embed_provider'] = 'gemini';
-		}
 		if ( ! $settings['sitechat_chat_provider'] ) {
 			$settings['sitechat_chat_provider'] = 'gemini';
 		}

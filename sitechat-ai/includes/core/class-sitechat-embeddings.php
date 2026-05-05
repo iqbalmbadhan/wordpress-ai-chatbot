@@ -18,8 +18,15 @@ class SiteChat_Embeddings {
 
 	// ── Provider selection ────────────────────────────────────────────────────
 
+	/**
+	 * Derive the embedding provider from the selected chat provider.
+	 * - gemini → gemini embeddings  (one key for everything)
+	 * - openai → openai embeddings  (one key for everything)
+	 * - all others → gemini (free fallback for indexing)
+	 */
 	private function provider(): string {
-		return (string) get_option( 'sitechat_embed_provider', 'gemini' );
+		$chat = (string) get_option( 'sitechat_chat_provider', 'gemini' );
+		return in_array( $chat, [ 'gemini', 'openai' ], true ) ? $chat : 'gemini';
 	}
 
 	private function api_key(): string {
